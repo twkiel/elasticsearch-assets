@@ -194,7 +194,7 @@ function selfValidation(op) {
     }
 }
 
-function crossValidation(context, job) {
+function crossValidation(job) {
     if (job.lifecycle === 'persistent') {
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
         if (op.interval === 'auto') {

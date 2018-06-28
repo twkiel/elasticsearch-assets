@@ -110,7 +110,7 @@ function schema() {
 }
 
 
-function crossValidation(context, job) {
+function crossValidation(job) {
     const opConfig = getOpConfig(job, 'id_reader');
 
     if (opConfig.key_range && job.slicers > opConfig.key_range.length) {

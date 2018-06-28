@@ -210,9 +210,9 @@ function schema() {
     };
 }
 
-function crossValidation(context, job) {
+function crossValidation(job, sysconfig) {
     const opConfig = getOpConfig(job, 'elasticsearch_bulk');
-    const elasticConnectors = context.sysconfig.terafoundation.connectors.elasticsearch;
+    const elasticConnectors = sysconfig.terafoundation.connectors.elasticsearch;
 
     // check to verify if connection map provided is consistent with sysconfig.terafoundation.connectors
     if (opConfig.multisend) {
