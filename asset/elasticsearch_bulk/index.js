@@ -3,9 +3,9 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 const elasticApi = require('@terascope/elasticsearch-api');
+const { getClient, getOpConfig } = require('../utils');
 
 function newProcessor(context, opConfig) {
-    const { job_runner: { getOpConfig }, op_runner: { getClient } } = context.apis;
     const { connection_map: connectionMap, multisend_index_append: multisendIndexAppend, size: limit } = opConfig;
     const bulkContexts = {};
 
@@ -210,10 +210,9 @@ function schema() {
     };
 }
 
-function crossValidation(context, job) {
-    const { getOpConfig } = context.apis.job_runner;
+function crossValidation(job, sysconfig) {
     const opConfig = getOpConfig(job, 'elasticsearch_bulk');
-    const elasticConnectors = context.sysconfig.terafoundation.connectors.elasticsearch;
+    const elasticConnectors = sysconfig.terafoundation.connectors.elasticsearch;
 
     // check to verify if connection map provided is consistent with sysconfig.terafoundation.connectors
     if (opConfig.multisend) {

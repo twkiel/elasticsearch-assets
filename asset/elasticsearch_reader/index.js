@@ -1,22 +1,19 @@
 'use strict';
 
-const { dateOptions } = require('../utils');
+const { dateOptions, getClient, getOpConfig } = require('../utils');
 const dateMath = require('datemath-parser');
 const moment = require('moment');
 const _ = require('lodash');
 
 
 function newSlicer(context, executionContext, retryData, logger) {
-    const { job_runner: { getOpConfig }, op_runner: { getClient } } = context.apis;
     const opConfig = getOpConfig(executionContext.config, 'elasticsearch_reader');
     const client = getClient(context, opConfig, 'elasticsearch');
     return require('./elasticsearch_date_range/slicer.js')(context, opConfig, executionContext, retryData, logger, client);
 }
 
 function newReader(context, opConfig, executionConfig) {
-    const { getClient } = context.apis.op_runner;
     const client = getClient(context, opConfig, 'elasticsearch');
-
     return require('./elasticsearch_date_range/reader.js')(context, opConfig, executionConfig, client);
 }
 
@@ -197,9 +194,8 @@ function selfValidation(op) {
     }
 }
 
-function crossValidation(context, job) {
+function crossValidation(job) {
     if (job.lifecycle === 'persistent') {
-        const { getOpConfig } = context.apis.job_runner;
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
         if (op.interval === 'auto') {
             throw new Error('interval for reader must be manually set while job is in persistent mode');

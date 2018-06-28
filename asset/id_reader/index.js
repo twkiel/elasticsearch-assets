@@ -2,9 +2,9 @@
 
 const _ = require('lodash');
 const elasticApi = require('@terascope/elasticsearch-api');
+const { getClient, getOpConfig } = require('../utils');
 
 function newSlicer(context, executionContext, retryData, logger) {
-    const { job_runner: { getOpConfig }, op_runner: { getClient } } = context.apis;
     const opConfig = getOpConfig(executionContext.config, 'id_reader');
     const client = getClient(context, opConfig, 'elasticsearch');
 
@@ -110,8 +110,7 @@ function schema() {
 }
 
 
-function crossValidation(context, job) {
-    const { getOpConfig } = context.apis.job_runner;
+function crossValidation(job) {
     const opConfig = getOpConfig(job, 'id_reader');
 
     if (opConfig.key_range && job.slicers > opConfig.key_range.length) {
