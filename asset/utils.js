@@ -78,7 +78,7 @@ function getOpConfig(job, name) {
     return job.operations.find(op => op._op === name);
 }
 
-// FIXME: this function is duplication of apis. Putting this in for 
+// FIXME: this function is duplication of apis. Putting this in for
 // backwards compatibility until that api is settled
 function getClient(context, config, type) {
     const clientConfig = {};
