@@ -1,12 +1,12 @@
 'use strict';
 
-const esSender = require('../asset/elasticsearch_bulk');
 const events = require('events');
 const Promise = require('bluebird');
+
 const eventEmitter = new events.EventEmitter();
+const esSender = require('../asset/elasticsearch_bulk');
 
 describe('elasticsearch_bulk', () => {
-
     function makeClient() {
         return {
             bulk(results) {
@@ -16,16 +16,22 @@ describe('elasticsearch_bulk', () => {
     }
 
     let opConfig = {};
-
     const context = {
         foundation: {
             getEventEmitter() {
                 return eventEmitter;
+            },
+            getConnection() {
+                return { client: makeClient()} 
             }
         },
         apis: {
             job_runner: { getOpConfig() { return opConfig;} },
-            op_runner: { getClient() { return makeClient(); } }
+            op_runner: {
+                getClient() {
+                    return makeClient();
+                }
+            }
         },
         logger: {
             error() {},
@@ -34,7 +40,7 @@ describe('elasticsearch_bulk', () => {
         }
     };
 
-    const { logger } = context
+    const { logger } = context;
 
     it('has both a newSender and schema method', () => {
         expect(esSender.newProcessor).toBeDefined();
@@ -59,13 +65,13 @@ describe('elasticsearch_bulk', () => {
         expect(typeof sender).toEqual('function');
     });
 
-   it('if no docs, returns a promise of passed in data', (done) => {
+    it('if no docs, returns a promise of passed in data', (done) => {
         const opConfig = { size: 100, multisend: false };
         const jobConfig = {};
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender([], logger))
+            .then(() => sender([], logger))
             .then((val) => {
                 expect(val).toEqual([]);
                 done();
@@ -87,7 +93,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(1);
                 expect(val[0].body.length).toEqual(50);
@@ -109,7 +115,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(2);
                 // length to index is off by 1
@@ -128,7 +134,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(2);
                 // length to index is off by 1
@@ -155,7 +161,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(1);
                 // length to index is off by 1
@@ -182,7 +188,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(2);
                 // length to index is off by 1
@@ -210,7 +216,7 @@ describe('elasticsearch_bulk', () => {
 
         const sender = esSender.newProcessor(context, opConfig, jobConfig);
         Promise.resolve()
-            .then(() =>  sender(incData, logger))
+            .then(() => sender(incData, logger))
             .then((val) => {
                 expect(val.length).toEqual(1);
                 // length to index is off by 1
@@ -251,12 +257,12 @@ describe('elasticsearch_bulk', () => {
 
         expect(() => {
             opConfig = badJob.operations[0];
-            esSender.crossValidation(context, badJob);
+            esSender.crossValidation(badJob, sysconfig);
         }).toThrowError(errorString);
 
-         expect(() => {
+        expect(() => {
             opConfig = goodJob.operations[0];
-            esSender.crossValidation(context, goodJob);
+            esSender.crossValidation(goodJob, sysconfig);
         }).not.toThrow();
     });
 });

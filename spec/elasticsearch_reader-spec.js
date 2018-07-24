@@ -1,10 +1,10 @@
 'use strict';
 
-const elasticDateReader = require('../asset/elasticsearch_reader');
 const Promise = require('bluebird');
 const moment = require('moment');
 const _ = require('lodash');
 const EventEmitter = require('events');
+const elasticDateReader = require('../asset/elasticsearch_reader');
 
 const events = new EventEmitter();
 
@@ -63,21 +63,23 @@ describe('elasticsearch_reader', () => {
                     }
                 });
             }
-        }
+        };
     }
 
     const context = {
         foundation: {
             getEventEmitter() {
                 return events;
-            }
+            },
+            getConnection: () => ({ client: makeClient() })
         },
         apis: {
             foundation: {
                 getSystemEvents: () => events,
-                makeLogger: () => logger
+                makeLogger: () => logger,
+                getConnection: () => ({ client: makeClient() })
             },
-            job_runner: { getOpConfig() { return _opConfig;} },
+            job_runner: { getOpConfig() { return _opConfig; } },
             op_runner: { getClient() { return makeClient(); } }
         },
         logger
@@ -85,7 +87,7 @@ describe('elasticsearch_reader', () => {
 
     function getNewSlicer(_jobInstance) {
         const jobInstance = _.cloneDeep(_jobInstance);
-        _opConfig = jobInstance.config.operations[0];
+        [_opConfig] = jobInstance.config.operations;
 
         return elasticDateReader.newSlicer(
             context,
@@ -119,7 +121,12 @@ describe('elasticsearch_reader', () => {
     });
 
     it('newReader returns a function that queries elasticsearch', () => {
-        const opConfig = { date_field_name: '@timestamp', size: 50, index: 'someIndex', full_response: true };
+        const opConfig = {
+            date_field_name: '@timestamp',
+            size: 50,
+            index: 'someIndex',
+            full_response: true
+        };
         const jobConfig = { lifecycle: 'once' };
         const reader = elasticDateReader.newReader(context, opConfig, jobConfig);
 
@@ -320,7 +327,7 @@ describe('elasticsearch_reader', () => {
                 const slicer = slicerArray[0];
                 return Promise.resolve()
                     .then(() => slicer())
-                    .then(results => expect(results).toEqual(null))
+                    .then(results => expect(results).toEqual(null));
             })
             .catch(fail)
             .finally(done);
@@ -540,7 +547,7 @@ describe('elasticsearch_reader', () => {
                     })
                     .then(results => expect(results).toEqual(null))
                     .catch(fail)
-                    .finally(done)
+                    .finally(done);
             });
     });
 
@@ -676,7 +683,7 @@ describe('elasticsearch_reader', () => {
                         expect(resultsMillisecond.count).toEqual(100);
                     })
                     .catch(fail)
-                    .finally(done)
+                    .finally(done);
             });
     });
 

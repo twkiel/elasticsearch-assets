@@ -4,8 +4,10 @@ const Promise = require('bluebird');
 const moment = require('moment');
 const _ = require('lodash');
 const dateMath = require('datemath-parser');
-const { dateOptions, retryModule, dateFormat: dateFormatMS, dateFormatSeconds: dateFormatS } = require('../../utils');
 const parseError = require('@terascope/error-parser');
+const {
+    dateOptions, retryModule, dateFormat: dateFormatMS, dateFormatSeconds: dateFormatS
+} = require('../../utils');
 
 function newSlicer(context, opConfig, executionContext, retryData, logger, client) {
     const events = context.apis.foundation.getSystemEvents();
@@ -25,8 +27,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
             const regex = /(\d+)(\D+)/i;
             const interval = regex.exec(str);
             if (interval === null) {
-                throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow ' +
-                    '[number][letter\'s] format, e.g. "12s"');
+                throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
             }
 
             // dont need first parameter, its the full string
@@ -35,8 +36,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
             return compareInterval(interval, esDates);
         }
 
-        throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow ' +
-                '[number][letter\'s] format, e.g. "12s"');
+        throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
     }
 
     function compareInterval(interval, esDates) {
@@ -334,7 +334,13 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
     }
 
     function getMilliseconds(interval) {
-        const times = { d: 86400000, h: 3600000, m: 60000, s: 1000, ms: 1 };
+        const times = {
+            d: 86400000,
+            h: 3600000,
+            m: 60000,
+            s: 1000,
+            ms: 1
+        };
 
         return interval[0] * times[interval[1]];
     }

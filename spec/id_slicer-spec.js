@@ -1,8 +1,8 @@
 'use strict';
 
-const idReader = require('../asset/id_reader');
 const Promise = require('bluebird');
 const events = require('events');
+const idReader = require('../asset/id_reader');
 
 const eventEmitter = new events.EventEmitter();
 
@@ -34,20 +34,20 @@ describe('id_reader', () => {
 
                 if (clientData.length > 1) {
                     const data = clientData.shift();
-                    return Promise.resolve(
-                        Object.assign({}, data, metaData));
+                    return Promise.resolve(Object.assign({}, data, metaData));
                 }
 
                 return Promise.resolve(Object.assign({}, clientData[0], metaData));
             }
-        }
+        };
     }
 
     const context = {
         foundation: {
             getEventEmitter() {
                 return eventEmitter;
-            }
+            },
+            getConnection: () => ({ client: makeClient() })
         },
         logger: {
             error() {},
@@ -56,14 +56,15 @@ describe('id_reader', () => {
         },
         apis: {
             foundation: {
-                getSystemEvents: () => eventEmitter
+                getSystemEvents: () => eventEmitter,
+                getConnection: () => ({ client: makeClient() })
             },
-            job_runner: { getOpConfig() { return _opConfig;} },
+            job_runner: { getOpConfig() { return _opConfig; } },
             op_runner: { getClient() { return makeClient(); } }
         }
     };
 
-    const logger = context.logger;
+    const { logger } = context;
 
     it('has a schema, newSlicer and a newReader method, crossValidation', () => {
         const reader = idReader;
@@ -93,8 +94,8 @@ describe('id_reader', () => {
         const job6 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
 
         function testValidation(job) {
-            _opConfig = job.operations[0];
-            idReader.crossValidation(context, job);
+            [_opConfig] = job.operations;
+            idReader.crossValidation(job);
         }
         expect(() => {
             testValidation(job1);
@@ -132,14 +133,14 @@ describe('id_reader', () => {
                 operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
             }
         };
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
             .then((slicers) => {
                 expect(slicers.length).toEqual(1);
                 expect(typeof slicers[0]).toEqual('function');
-                _opConfig = job2.config.operations[0];
+                [_opConfig] = job2.config.operations;
                 return idReader.newSlicer(context, job2, retryData, logger);
             })
             .then((slicers) => {
@@ -165,7 +166,7 @@ describe('id_reader', () => {
                 }]
             }
         };
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -200,7 +201,7 @@ describe('id_reader', () => {
                 }]
             }
         };
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -232,7 +233,7 @@ describe('id_reader', () => {
                 }]
             }
         };
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -270,7 +271,7 @@ describe('id_reader', () => {
             }
         };
 
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -284,8 +285,8 @@ describe('id_reader', () => {
                     expect(results[0]).toEqual(null);
                     expect(results[1]).toEqual(null);
                 }))
-                .catch(fail)
-                .finally(done);
+            .catch(fail)
+            .finally(done);
     });
 
     it('key range gets divided up by number of slicers', (done) => {
@@ -311,7 +312,7 @@ describe('id_reader', () => {
             }
         };
 
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -352,7 +353,7 @@ describe('id_reader', () => {
             }
         };
 
-        _opConfig = job1.config.operations[0];
+        [_opConfig] = job1.config.operations;
 
         Promise.resolve()
             .then(() => idReader.newSlicer(context, job1, retryData, logger))
@@ -378,6 +379,6 @@ describe('id_reader', () => {
                     done();
                 }))
             .catch(fail)
-            .finally(done);    
+            .finally(done);
     });
 });
