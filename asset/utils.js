@@ -101,11 +101,21 @@ function getClient(context, config, type) {
     }
 }
 
+function existsSync(filename) {
+    try {
+        fs.accessSync(filename);
+        return true;
+    } catch (ex) {
+        return false;
+    }
+}
+
 module.exports = {
     dateOptions,
     dateFormat,
     dateFormatSeconds,
     retryModule,
     getOpConfig,
-    getClient
+    getClient,
+    existsSync
 };
