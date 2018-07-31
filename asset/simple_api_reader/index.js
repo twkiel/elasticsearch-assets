@@ -36,6 +36,9 @@ function createClient(context, opConfig) {
     }
 
     function apiSearch(queryConfig) {
+        const mustQuery = _.get(queryConfig, 'body.query.bool.must', []);
+        const query = parseQueryConfig(mustQuery);
+
         function parseQueryConfig(mustArray) {
             const queryOptions = {
                 query_string: _parseEsQ,
@@ -44,27 +47,21 @@ function createClient(context, opConfig) {
             let geoQuery = _parseGeoQuery();
             if (geoQuery.length > 0) geoQuery = `&${geoQuery}`;
             let query = '';
-            if (mustArray) {
-                mustArray.forEach((queryAction) => {
-                    _.forOwn(queryAction, (config, key) => {
-                        const queryFn = queryOptions[key];
-                        if (queryFn) {
-                            const queryStr = queryFn(config);
-                            if (query.length) {
-                                query = `${query} AND ${queryStr}`;
-                            } else {
-                                query = queryStr;
-                            }
+            
+            mustArray.forEach((queryAction) => {
+                _.forOwn(queryAction, (config, key) => {
+                    const queryFn = queryOptions[key];
+                    if (queryFn) {
+                        const queryStr = queryFn(config);
+                        if (query.length) {
+                            query = `${query} AND ${queryStr}`;
+                        } else {
+                            query = queryStr;
                         }
-                    });
+                    }
                 });
-            } else {
-                // TODO: review this area
-                // get default date query
-                console.log('\n\n\n AM I IN THE ELSE \n\n', mustArray)
-                query = _parseEsQ();
-                // query = _parseDate(null);
-            }
+            });
+            
             // geo sort will be taken care of in the teraserver search api
             let sort = '';
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
@@ -112,7 +109,6 @@ function createClient(context, opConfig) {
             return results;
         }
 
-        // needs queryConfig.body.query.range
         function _parseDate(op) {
             let range;
             if (op) {
@@ -128,10 +124,6 @@ function createClient(context, opConfig) {
             return `${opConfig.date_field_name}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
-        
-        const mustQuery = _.get(queryConfig, 'body.query.bool.must', undefined);
-        const query = parseQueryConfig(mustQuery);
-        //socket.setTimeout(opConfig.timeout);
         function callTeraserver(uri) {
             logger.debug(`sending call to ${uri}`);
             return Promise.resolve()
@@ -156,10 +148,9 @@ function createClient(context, opConfig) {
                     });
                 });
         }
-        return callTeraserver(query);
-    
-    }
 
+        return callTeraserver(query);
+    }
 
     return {
         search(queryConfig) {
@@ -198,7 +189,6 @@ function createClient(context, opConfig) {
         }
     };
 }
-
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, MODULE_NAME);
