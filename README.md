@@ -19,3 +19,6 @@ cd ..  //return to root folder
 zip -r asset.zip ./asset
 curl -XPOST -H "Content-Type: application/octet-stream" TERASLICE_HOSTNAME:5678/assets --data-binary @asset.zip
 ```
+
+## Operations
+ * [processor documentation](./docs/ops_reference.md)
