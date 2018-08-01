@@ -59,7 +59,8 @@ describe('simple_api_reader', () => {
         geo_field: 'some_field',
         geo_box_top_left: '34.5234,79.42345',
         geo_box_bottom_right: '54.5234,80.3456',
-        geo_sort_point: '52.3456,79.6784'
+        geo_sort_point: '52.3456,79.6784',
+        timeout: 50
     };
 
     const opConfig3 = {
@@ -72,7 +73,20 @@ describe('simple_api_reader', () => {
         delay: '30s',
         date_field_name: 'date',
         geo_distance: '200km',
-        geo_point: '52.3456,79.6784'
+        geo_point: '52.3456,79.6784',
+        timeout: 50
+    };
+
+    const opConfig4 = {
+        _op: 'simple_api_reader',
+        index: 'details-subset',
+        endpoint: 'https://localhost:8000',
+        token: 'test-token',
+        size: 5000,
+        interval: '90d',
+        date_field_name: 'date',
+        query: 'bytes:>=2000',
+        timeout: 50
     };
 
     const context = {
@@ -113,6 +127,7 @@ describe('simple_api_reader', () => {
         const client = processor.createClient(context, opConfig);
         const client2 = processor.createClient(context, opConfig2);
         const client3 = processor.createClient(context, opConfig3);
+        const client4 = processor.createClient(context, opConfig4);
 
         const rangeQuery = {
             range: {
@@ -168,12 +183,14 @@ describe('simple_api_reader', () => {
         const query3 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery], sort1);
         const query4 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery]);
         const query5 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery], sort2);
+        const query6 = {"index":"details-subset","size":5000,"body":{"sort":[{"created":{"order":"asc"}}]},"q":"bytes:>=2000"};
 
         const url1 = 'https://localhost:8000/details-subset?token=test-token&q=date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url2 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url3 ='https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&geo_box_top_left=34.5234,79.42345&geo_box_bottom_right=54.5234,80.3456&geo_sort_point=52.3456,79.6784';
         const url4 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&geo_point=52.3456,79.6784&geo_distance=200km';
         const url5 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&sort=date:asc&geo_point=52.3456,79.6784&geo_distance=200km';
+        const url6 = 'https://localhost:8000/details-subset?token=test-token&q=bytes:>=2000&size=5000';
 
         Promise.resolve()
             .then(() => client.search(query1))
@@ -200,6 +217,11 @@ describe('simple_api_reader', () => {
             .then(() => {
                 const url = allRequests.pop();
                 expect(url).toEqual(url5);
+                return client4.search(query6)
+            })
+            .then(() => {
+                const url = allRequests.pop();
+                expect(url).toEqual(url6);
             })
             .catch(fail)
             .finally(done);

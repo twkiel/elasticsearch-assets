@@ -22,7 +22,7 @@ function createClient(context, opConfig) {
     function makeRequest(uri){
         return new Promise((resolve, reject) => {
             const ref = setTimeout(() => reject('HTTP request timed out connecting to API endpoint.'), opConfig.timeout);
-            
+
             fetchData({ uri, json: true})
                 .then((results) => {
                     clearTimeout(ref);
@@ -36,7 +36,7 @@ function createClient(context, opConfig) {
     }
 
     function apiSearch(queryConfig) {
-        const mustQuery = _.get(queryConfig, 'body.query.bool.must', []);
+        const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
         const query = parseQueryConfig(mustQuery);
 
         function parseQueryConfig(mustArray) {
@@ -48,20 +48,23 @@ function createClient(context, opConfig) {
             if (geoQuery.length > 0) geoQuery = `&${geoQuery}`;
             let query = '';
             
-            mustArray.forEach((queryAction) => {
-                _.forOwn(queryAction, (config, key) => {
-                    const queryFn = queryOptions[key];
-                    if (queryFn) {
-                        const queryStr = queryFn(config);
-                        if (query.length) {
-                            query = `${query} AND ${queryStr}`;
-                        } else {
-                            query = queryStr;
+            if (mustArray) {
+                mustArray.forEach((queryAction) => {
+                    _.forOwn(queryAction, (config, key) => {
+                        const queryFn = queryOptions[key];
+                        if (queryFn) {
+                            const queryStr = queryFn(config);
+                            if (query.length) {
+                                query = `${query} AND ${queryStr}`;
+                            } else {
+                                query = queryStr;
+                            }
                         }
-                    }
+                    });
                 });
-            });
-            
+            } else {
+                query = _parseEsQ();
+            }
             // geo sort will be taken care of in the teraserver search api
             let sort = '';
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
@@ -125,7 +128,6 @@ function createClient(context, opConfig) {
         }
 
         function callTeraserver(uri) {
-            logger.debug(`sending call to ${uri}`);
             return Promise.resolve()
                 .then(() => makeRequest(uri))
                 .then((response) => {
