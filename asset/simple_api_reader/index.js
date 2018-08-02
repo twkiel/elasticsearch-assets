@@ -148,6 +148,10 @@ function createClient(context, opConfig) {
                             failed: 0
                         }
                     });
+                })
+                .catch((err) => {
+                    logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
+                    return Promise.reject(err.message)
                 });
         }
 
