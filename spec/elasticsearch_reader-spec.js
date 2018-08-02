@@ -120,6 +120,32 @@ describe('elasticsearch_reader', () => {
         expect(schema.interval.default).toEqual('auto');
     });
 
+    it('can test geo validations', () => {
+        const schema = elasticDateReader.schema();
+        const geoPointValidation = schema.geo_box_top_left.format;
+        const validGeoDistance = schema.geo_distance.format;
+        const geoSortOrder = schema.geo_sort_order.format;
+
+        expect(() => geoPointValidation()).not.toThrowError();
+        expect(() => validGeoDistance()).not.toThrowError();
+        expect(() => geoSortOrder()).not.toThrowError();
+
+        expect(() => geoPointValidation(19.1234)).toThrowError('parameter must be a string IF specified');
+        expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
+        expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('latitude parameter is incorrect, was given 190.1234, should be >= -90 and <= 90');
+        expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('longitutde parameter is incorrect, was given 185.2134, should be >= -180 and <= 180');
+        expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
+
+        expect(() => validGeoDistance(19.1234)).toThrowError('parameter must be a string IF specified');
+        expect(() => validGeoDistance(' ')).toThrowError('geo_distance paramter is formatted incorrectly');
+        expect(() => validGeoDistance('200something')).toThrowError('unit type did not have a proper unit of measuerment (ie m, km, yd, ft)');
+        expect(() => validGeoDistance('200km')).not.toThrowError();
+
+        expect(() => geoSortOrder(1234)).toThrowError('parameter must be a string IF specified');
+        expect(() => geoSortOrder('hello')).toThrowError('if geo_sort_order is specified it must be either "asc" or "desc"');
+        expect(() => geoSortOrder('asc')).not.toThrowError();
+    });
+
     it('newReader returns a function that queries elasticsearch', () => {
         const opConfig = {
             date_field_name: '@timestamp',
@@ -194,6 +220,7 @@ describe('elasticsearch_reader', () => {
         const badOP = { subslice_by_key: true };
         const goodOP = { subslice_by_key: true, type: 'events-' };
         const otherGoodOP = { subslice_by_key: false, type: 'events-' };
+        // NOTE: geo self validations are tested in elasticsearch_api module
 
         expect(() => {
             elasticDateReader.selfValidation(badOP);

@@ -1,12 +1,10 @@
 'use strict';
 
-const http = require('http');
-const https = require('https');
-
 const Promise = require('bluebird');
 const _ = require('lodash');
+const request = require('request-promise');
 
-// This is not ideal.
+// eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 function getOpConfig(job, name) {
@@ -19,8 +17,28 @@ function createClient(context, opConfig) {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     const { logger } = context;
+    const fetchData = context.__test_mocks || request;
+
+    function makeRequest(uri){
+        return new Promise((resolve, reject) => {
+            const ref = setTimeout(() => reject('HTTP request timed out connecting to API endpoint.'), opConfig.timeout);
+
+            fetchData({ uri, json: true})
+                .then((results) => {
+                    clearTimeout(ref);
+                    resolve(results)
+                })
+                .catch(err => {
+                    clearTimeout(ref);
+                    reject(err);
+                })
+        })
+    }
 
     function apiSearch(queryConfig) {
+        const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
+        const query = parseQueryConfig(mustQuery);
+
         function parseQueryConfig(mustArray) {
             const queryOptions = {
                 query_string: _parseEsQ,
@@ -29,7 +47,7 @@ function createClient(context, opConfig) {
             let geoQuery = _parseGeoQuery();
             if (geoQuery.length > 0) geoQuery = `&${geoQuery}`;
             let query = '';
-
+            
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
                     _.forOwn(queryAction, (config, key) => {
@@ -45,17 +63,19 @@ function createClient(context, opConfig) {
                     });
                 });
             } else {
-                // TODO: review this area
-                // get default date query
                 query = _parseEsQ();
-                // query = _parseDate(null);
             }
             // geo sort will be taken care of in the teraserver search api
             let sort = '';
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
-                sort = `&sort=${opConfig.date_field_name}:${queryConfig.body.sort[0][opConfig.date_field_name].order}`; // {"date":{"order":"asc"}}
+                queryConfig.body.sort.forEach((sortType) => {
+                    // We are only checking for date sorts, geo sorts are already handled by _parseGeoQuery
+                    if (sortType[opConfig.date_field_name]) {
+                        // {"date":{"order":"asc"}}
+                        sort = `&sort=${opConfig.date_field_name}:${queryConfig.body.sort[0][opConfig.date_field_name].order}`;
+                    }
+                });
             }
-
             let { size } = queryConfig;
             if (size === undefined) {
                 ({ size } = opConfig);
@@ -92,7 +112,6 @@ function createClient(context, opConfig) {
             return results;
         }
 
-        // needs queryConfig.body.query.range
         function _parseDate(op) {
             let range;
             if (op) {
@@ -108,51 +127,19 @@ function createClient(context, opConfig) {
             return `${opConfig.date_field_name}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
-        return new Promise(((resolve, reject) => {
-            const mustQuery = _.get(queryConfig, 'body.query.bool.must', undefined);
-            const query = parseQueryConfig(mustQuery);
-
-            let protocol = http;
-            if (query.indexOf('https') === 0) protocol = https;
-
-            // Hack to stub out the actual HTTP request
-            if (context.__test_mocks) {
-                protocol = context.__test_mocks;
-            }
-
-            const activeRequest = protocol.get(query, (response) => {
-                let body = '';
-                // consume response body
-                response.on('data', (chunk) => {
-                    body += chunk;
-                });
-
-                response.on('end', () => {
-                    let fullResonse;
-                    if (body.startsWith('<')) {
-                        // If we get an HTML tag in the response then something broke.
-                        return reject(`Error response from the API: ${body}`);
-                    }
-
-                    try {
-                        fullResonse = JSON.parse(body);
-                        if (fullResonse.error) {
-                            return reject(fullResonse.error);
-                        }
-                    } catch (err) {
-                        return reject(err);
-                    }
-
-                    // Simulate ES query response
+        function callTeraserver(uri) {
+            return Promise.resolve()
+                .then(() => makeRequest(uri))
+                .then((response) => {
                     let esResults = [];
-                    if (fullResonse.results) {
-                        esResults = _.map(fullResonse.results, result => ({ _source: result }));
+                    if (response.results) {
+                        esResults = _.map(response.results, result => ({ _source: result }));
                     }
 
-                    return resolve({
+                    return ({
                         hits: {
                             hits: esResults,
-                            total: fullResonse.total
+                            total: response.total
                         },
                         timed_out: false,
                         _shards: {
@@ -161,20 +148,14 @@ function createClient(context, opConfig) {
                             failed: 0
                         }
                     });
+                })
+                .catch((err) => {
+                    logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
+                    return Promise.reject(err.message)
                 });
+        }
 
-                response.resume();
-            }).on('error', (e) => {
-                logger.error(`simple_api_reader error: ${e.message}`);
-                reject(e.message);
-            }).on('socket', (socket) => {
-                socket.setTimeout(opConfig.timeout);
-                socket.on('timeout', () => {
-                    activeRequest.abort();
-                    reject('HTTP request timed out connecting to API endpoint.');
-                });
-            });
-        }));
+        return callTeraserver(query);
     }
 
     return {
@@ -218,27 +199,12 @@ function createClient(context, opConfig) {
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, MODULE_NAME);
     const client = createClient(context, opConfig);
-
     return require('../elasticsearch_reader/elasticsearch_date_range/slicer')(context, opConfig, executionContext, retryData, logger, client);
 }
 
 function newReader(context, opConfig, jobConfig) {
     const client = createClient(context, opConfig);
-    const reader = require('../elasticsearch_reader/elasticsearch_date_range/reader')(context, opConfig, jobConfig, client);
-    // This is a work around for the issue of the elasticsearch_api
-    // returning a number when size is 0.
-
-    // TODO: review me!!!!
-    return function getData(data, logger) {
-        return Promise.resolve(reader(data, logger))
-            .then((results) => {
-                if (_.isNumber(results)) {
-                    return [];
-                }
-
-                return results;
-            });
-    };
+    return require('../elasticsearch_reader/elasticsearch_date_range/reader')(context, opConfig, jobConfig, client);
 }
 
 function schema() {

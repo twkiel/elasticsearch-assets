@@ -156,6 +156,11 @@ function schema() {
                 }
             }
         },
+        key_type: {
+            doc: 'The type of id used in index',
+            default: 'base64url',
+            format: ['base64url', 'hexadecimal']
+        },
         time_resolution: {
             doc: 'indicate if data reading has second or millisecond resolutions',
             default: 's',
@@ -175,33 +180,28 @@ function schema() {
                 }
             }
         },
-        key_type: {
-            doc: 'The type of id used in index',
-            default: 'base64url',
-            format: ['base64url', 'hexadecimal']
-        },
         geo_field: {
             doc: 'field name where the geolocation data is located',
             default: '',
             format: 'optional_String'
         },
         geo_box_top_left: {
-            doc: 'used in a bonding box query',
+            doc: 'used for a bounding box query',
             default: '',
             format: geoPointValidation
         },
         geo_box_bottom_right: {
-            doc: 'used in a bonding box query',
+            doc: 'used for a bounding box query',
             default: '',
             format: geoPointValidation
         },
         geo_point: {
-            doc: 'used in a geo distance query',
+            doc: 'used for a geo distance query',
             default: '',
             format: geoPointValidation
         },
         geo_distance: {
-            doc: 'used in a geo distance query',
+            doc: 'used for a geo distance query',
             default: '',
             format: validGeoDistance
         },
@@ -217,7 +217,7 @@ function schema() {
                 if (val) {
                     const options = { asc: true, desc: true };
                     if (typeof val !== 'string') throw new Error('parameter must be a string IF specified');
-                    if (!options[val]) throw new Error(' if geo_sort_order is specified it must be either "asc" or "desc" ');
+                    if (!options[val]) throw new Error('if geo_sort_order is specified it must be either "asc" or "desc"');
                 }
             }
         },
@@ -239,7 +239,7 @@ function geoPointValidation(point) {
         const longitutde = pieces[1];
 
         if (latitude > 90 || latitude < -90) throw new Error(`latitude parameter is incorrect, was given ${latitude}, should be >= -90 and <= 90`);
-        if (longitutde[1] > 180 || longitutde[1] < -180) throw new Error(`longitutde parameter is incorrect, was given ${longitutde}, should be >= -180 and <= 180`);
+        if (longitutde > 180 || longitutde < -180) throw new Error(`longitutde parameter is incorrect, was given ${longitutde}, should be >= -180 and <= 180`);
     }
 }
 
@@ -259,6 +259,7 @@ function checkUnits(unit) {
 
 function validGeoDistance(distance) {
     if (distance) {
+        if (typeof distance !== 'string') throw new Error('parameter must be a string IF specified');
         const matches = distance.match(/(\d+)(.*)$/);
         if (!matches) throw new Error('geo_distance paramter is formatted incorrectly');
 
