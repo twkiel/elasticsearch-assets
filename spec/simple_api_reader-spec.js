@@ -227,7 +227,7 @@ describe('simple_api_reader', () => {
             .finally(done);
     });
 
-    it('request can timeout properly', (done) => {
+   it('request can timeout properly', (done) => {
         const client = processor.createClient(context, opConfig);
         timeout = 75;
 

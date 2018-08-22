@@ -33,11 +33,6 @@ function newProcessor(context, opConfig, executionConfig) {
         return opConfig.index;
     }
 
-    // index_prefix is require if timeseries
-    if (opConfig.timeseries && !opConfig.index_prefix) {
-        throw new Error('timeseries requires an index_prefix');
-    }
-
     /*
      * Additional configuration fields. Should validate once a schema is available.
      * update - boolean. set to true if the ES request should be an update
@@ -49,43 +44,21 @@ function newProcessor(context, opConfig, executionConfig) {
      */
 
     return (data) => {
-        let fromElastic = false;
-        let dataArray = data;
-        const fullResponseData = _.get(dataArray, 'hits.hits');
-
-        if (fullResponseData) {
-            fromElastic = true;
-            dataArray = fullResponseData;
-        }
-
-        if (!opConfig.type && !fromElastic) {
-            throw new Error('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');
-        }
         const formatted = [];
 
         function generateRequest(start) {
-            let record;
-            if (fromElastic) {
-                record = dataArray[start]._source;
-            } else {
-                record = dataArray[start];
-            }
-
+            let record = data[start];
             const indexSpec = {};
 
             const meta = {
                 _index: indexName(record),
-                _type: opConfig.type ? opConfig.type : data.hits.hits[start]._type
+                _type: opConfig.type ? opConfig.type : record._type
             };
 
             if (opConfig.preserve_id) {
-                meta._id = data.hits.hits[start]._id;
+                meta._id = record._id;
             } else if (opConfig.id_field) {
-                if (fromElastic) {
-                    meta._id = dataArray[start]._source[opConfig.id_field];
-                } else {
-                    meta._id = dataArray[start][opConfig.id_field];
-                }
+                meta._id = record[opConfig.id_field];
             }
 
             if (opConfig.update || opConfig.upsert) {
@@ -147,7 +120,7 @@ function newProcessor(context, opConfig, executionConfig) {
             }
         }
 
-        for (let i = 0; i < dataArray.length; i += 1) {
+        for (let i = 0; i < data.length; i += 1) {
             generateRequest(i);
         }
 
@@ -278,16 +251,24 @@ function schema() {
 
 function selfValidation(op) {
     if (op.timeseries || op.index_prefix || op.date_field) {
-        if (!op.timeseries || !op.index_prefix || !op.date_field) {
+        if (!(op.timeseries && op.index_prefix && op.date_field)) {
             throw new Error('elasticsearch_index_selector is mis-configured, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters');
         }
-    } else if (op.index.length === 0) {
-        throw new Error('index must not be an empty string');
+    }
+}
+
+function crossValidation(job) {
+    const opConfig = job.operations.find(op => op._op === 'elasticseartch_index_selector');
+    const preserveId = job.operations.find(op => op.preserve_id === true);
+
+    if (!opConfig.type && !preserveId) {
+        throw new Error('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');
     }
 }
 
 module.exports = {
     newProcessor,
     selfValidation,
+    crossValidation,
     schema
 };

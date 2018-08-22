@@ -19,7 +19,7 @@ function createClient(context, opConfig) {
     const { logger } = context;
     const fetchData = context.__test_mocks || request;
 
-    function makeRequest(uri){
+    function makeRequest(uri) {
         return new Promise((resolve, reject) => {
             const ref = setTimeout(() => reject('HTTP request timed out connecting to API endpoint.'), opConfig.timeout);
 
@@ -151,7 +151,7 @@ function createClient(context, opConfig) {
                 })
                 .catch((err) => {
                     logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
-                    return Promise.reject(err.message)
+                    return Promise.reject(err)
                 });
         }
 
