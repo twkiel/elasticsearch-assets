@@ -49,9 +49,9 @@ describe('elasticsearch_reader', () => {
             search() {
                 let data;
                 if (clientData.length > 1) {
-                    data = [{ _source: clientData.shift() }];
+                    data = [{ _id: 'someId', _source: clientData.shift() }];
                 } else if (!allowSlicerToComplete) {
-                    data = [{ _source: clientData[0] }];
+                    data = [{ _id: 'someId', _source: clientData[0] }];
                 } else {
                     data = [];
                 }
@@ -158,6 +158,58 @@ describe('elasticsearch_reader', () => {
 
         expect(typeof reader).toEqual('function');
     });
+
+    it('newReader can return formated data', (done) => {
+        const firstDate = moment();
+        const laterDate = moment(firstDate).add(5, 'm');
+        const opConfig1 = {
+            date_field_name: '@timestamp',
+            size: 50,
+            index: 'someIndex'
+        };
+        const opConfig2 = {
+            date_field_name: '@timestamp',
+            size: 50,
+            index: 'someIndex',
+            full_response: true
+        };
+        const opConfig3 = {
+            date_field_name: '@timestamp',
+            size: 50,
+            index: 'someIndex',
+            preserve_id: true
+        };
+        const jobConfig = { lifecycle: 'once' };
+        const reader1 = elasticDateReader.newReader(context, opConfig1, jobConfig);
+        const reader2 = elasticDateReader.newReader(context, opConfig2, jobConfig);
+        const reader3 = elasticDateReader.newReader(context, opConfig3, jobConfig);
+
+        const msg = { count: 100, start: firstDate.format(), end: laterDate.format()}
+
+        const response1 = [];
+        const response2 = {"_shards":{"failed":0},"hits":{"total":100,"hits":[{"_source":{"@timestamp":"2018-08-24T19:09:48.134Z","count":100}}]}}; 
+
+        Promise.resolve()
+            .then(() => Promise.all([reader1(msg), reader2(msg), reader3(msg) ]))
+            .spread((results1, results2, results3) => {
+                expect(Array.isArray(results1)).toEqual(true);
+                expect(results1.hits).toEqual(undefined);
+                expect(typeof results1[0]).toEqual('object');
+
+                expect(results2.hits).toBeDefined();
+                expect(results2.hits.hits).toBeDefined();
+                expect(Array.isArray(results2.hits.hits)).toEqual(true);
+                expect(results2.hits.hits[0]._id).toEqual('someId');
+                
+                expect(Array.isArray(results3)).toEqual(true);
+                expect(results3.hits).toEqual(undefined);
+                expect(typeof results3[0]).toEqual('object');
+                expect(results3[0]._key).toEqual('someId');
+            })
+            .catch(fail)
+            .finally(done)
+    });
+
 
     it('newSlicer return a function', (done) => {
         const opConfig = {

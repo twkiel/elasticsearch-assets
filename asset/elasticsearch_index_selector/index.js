@@ -1,8 +1,9 @@
 'use strict';
 
 const _ = require('lodash');
+const util = require('util');
 
-function newProcessor(context, opConfig, executionConfig) {
+function newProcessor(context, opConfig) {
     function formattedDate(record) {
         const offsets = {
             daily: 10,
@@ -44,22 +45,33 @@ function newProcessor(context, opConfig, executionConfig) {
      */
 
     return (data) => {
+        let fromElastic = false;
+        let dataArray = data;
+        const fullResponseData = _.get(dataArray, 'hits.hits');
+
+        if (fullResponseData) {
+            fromElastic = true;
+            dataArray = fullResponseData;
+        }
         const formatted = [];
 
         function generateRequest(start) {
-            let record = data[start];
+            let record;
+            if (fromElastic) {
+                record = dataArray[start]._source;
+            } else {
+                record = dataArray[start];
+            }
             const indexSpec = {};
 
             const meta = {
                 _index: indexName(record),
-                _type: opConfig.type ? opConfig.type : record._type
+                _type: opConfig.type
             };
 
-            if (opConfig.preserve_id) {
-                meta._id = record._id;
-            } else if (opConfig.id_field) {
-                meta._id = record[opConfig.id_field];
-            }
+            if (opConfig.preserve_id) meta._id = record._key;
+            if (fromElastic) meta._id = data.hits.hits[start]._id; 
+            if (opConfig.id_field) meta._id = record[opConfig.id_field];
 
             if (opConfig.update || opConfig.upsert) {
                 indexSpec.update = meta;
@@ -120,7 +132,7 @@ function newProcessor(context, opConfig, executionConfig) {
             }
         }
 
-        for (let i = 0; i < data.length; i += 1) {
+        for (let i = 0; i < dataArray.length; i += 1) {
             generateRequest(i);
         }
 
@@ -258,7 +270,7 @@ function selfValidation(op) {
 }
 
 function crossValidation(job) {
-    const opConfig = job.operations.find(op => op._op === 'elasticseartch_index_selector');
+    const opConfig = job.operations.find(op => op._op === 'elasticsearch_index_selector');
     const preserveId = job.operations.find(op => op.preserve_id === true);
 
     if (!opConfig.type && !preserveId) {

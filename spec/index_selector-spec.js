@@ -42,33 +42,23 @@ describe('elasticsearch index selector', () => {
     it('new processor will throw properly', () => {
         const job1 = { 
             operations: [
-                { _op: 'elasticsearch_reader', preserve_id: true },
-                { _op: 'elasticseartch_index_selector' }
+                { _op: 'elasticsearch_reader' },
+                { _op: 'elasticsearch_index_selector', type: 'someType' }
             ]
         };
 
         const job2 = { 
             operations: [
                 { _op: 'elasticsearch_reader' },
-                { _op: 'elasticseartch_index_selector', type: 'someType' }
-            ]
-        };
-
-        const job3 = { 
-            operations: [
-                { _op: 'elasticsearch_reader' },
-                { _op: 'elasticseartch_index_selector' }
+                { _op: 'elasticsearch_index_selector' }
             ]
         };
 
         expect(() => {
             indexer.crossValidation(job1);
-        }).not.toThrowError();
+        }).not.toThrowError('e');
         expect(() => {
             indexer.crossValidation(job2);
-        }).not.toThrowError();
-        expect(() => {
-            indexer.crossValidation(job3);
         }).toThrowError('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');
     });
 
@@ -97,11 +87,28 @@ describe('elasticsearch index selector', () => {
         expect(results[1]).toEqual({ someData: 'some random data' });
     });
 
+    it('full_response still', () => {
+        const context = {};
+        const opConfig = { index: 'someIndex', type: 'events', full_response: true, delete: false };
+        const jobConfig = { logger: 'im a fake logger' };
+        const data = { 
+            hits: {
+                hits: [
+                    {_id: 'specialID', _source: { some: 'data' } }
+                ]
+            }
+        };
+
+        const fn = indexer.newProcessor(context, opConfig, jobConfig);
+        const results = fn(data);
+        expect(results[0]).toEqual({ index: { _index: 'someIndex', _type: 'events', _id: 'specialID' } });
+    });
+
     it('preserve_id will keep the previous id from elasticsearch data', () => {
         const context = {};
         const opConfig = { index: 'someIndex', type: 'events', preserve_id: true, delete: false };
         const jobConfig = { logger: 'im a fake logger' };
-        const data = [{ _type: 'someType', _id: 'specialID', some: 'data' }];
+        const data = [{ _key: 'specialID', some: 'data' }];
 
         const fn = indexer.newProcessor(context, opConfig, jobConfig);
         const results = fn(data);
