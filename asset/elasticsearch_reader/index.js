@@ -102,7 +102,12 @@ function schema() {
             }
         },
         full_response: {
-            doc: 'Set to true to receive the full Elasticsearch query response including index metadata.',
+            doc: 'DEPRECIATED : Set to true to receive the full Elasticsearch query response including index metadata.',
+            default: false,
+            format: Boolean
+        },
+        preserve_id: {
+            doc: 'Set to true to add the _id field of the doc set to _key on the documents returned',
             default: false,
             format: Boolean
         },
