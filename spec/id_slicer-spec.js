@@ -3,68 +3,11 @@
 const Promise = require('bluebird');
 const events = require('events');
 const idReader = require('../asset/id_reader');
-
-const eventEmitter = new events.EventEmitter();
+const harness = require('@terascope/teraslice-op-test-harness');
+const MockClient = require('./mock_client');
 
 describe('id_reader', () => {
-    let clientData;
-    let makeSearchFailure = false;
-    let _opConfig = {};
-
-    beforeEach(() => {
-        clientData = [
-            { hits: { total: 100 } },
-            { hits: { total: 100 } },
-            { hits: { total: 100 } },
-            { hits: { total: 100 } },
-            { hits: { total: 100 } },
-            { hits: { total: 100 } }
-        ];
-    });
-
-    function makeClient() {
-        return {
-            search() {
-                const metaData = { _shards: { failed: 0 } };
-                if (makeSearchFailure) {
-                    metaData._shards.failed = 1;
-                    metaData._shards.failures = [{ reason: { type: 'some Error' } }];
-                    makeSearchFailure = false;
-                }
-
-                if (clientData.length > 1) {
-                    const data = clientData.shift();
-                    return Promise.resolve(Object.assign({}, data, metaData));
-                }
-
-                return Promise.resolve(Object.assign({}, clientData[0], metaData));
-            }
-        };
-    }
-
-    const context = {
-        foundation: {
-            getEventEmitter() {
-                return eventEmitter;
-            },
-            getConnection: () => ({ client: makeClient() })
-        },
-        logger: {
-            error() {},
-            info() {},
-            warn() {}
-        },
-        apis: {
-            foundation: {
-                getSystemEvents: () => eventEmitter,
-                getConnection: () => ({ client: makeClient() })
-            },
-            job_runner: { getOpConfig() { return _opConfig; } },
-            op_runner: { getClient() { return makeClient(); } }
-        }
-    };
-
-    const { logger } = context;
+    const opTest = harness(idReader);
 
     it('has a schema, newSlicer and a newReader method, crossValidation', () => {
         const reader = idReader;
@@ -94,7 +37,6 @@ describe('id_reader', () => {
         const job6 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
 
         function testValidation(job) {
-            [_opConfig] = job.operations;
             idReader.crossValidation(job);
         }
         expect(() => {
@@ -119,147 +61,116 @@ describe('id_reader', () => {
         }).toThrowError(errorStr3);
     });
 
-    it('can create multiple slicers', (done) => {
+    it('can create multiple slicers', async () => {
         const retryData = [];
-        const job1 = {
-            config: {
+        const executionConfig1 = {
                 slicers: 1,
                 operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
-            }
         };
-        const job2 = {
-            config: {
-                slicers: 2,
-                operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
-            }
+        const executionConfig2 = {
+            slicers: 2,
+            operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
         };
-        [_opConfig] = job1.config.operations;
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then((slicers) => {
-                expect(slicers.length).toEqual(1);
-                expect(typeof slicers[0]).toEqual('function');
-                [_opConfig] = job2.config.operations;
-                return idReader.newSlicer(context, job2, retryData, logger);
-            })
-            .then((slicers) => {
-                expect(slicers.length).toEqual(2);
-                expect(typeof slicers[0]).toEqual('function');
-                expect(typeof slicers[1]).toEqual('function');
-            })
-            .catch(fail)
-            .finally(done);
+        const singleSlicer = await opTest.init({ executionConfig: executionConfig1 });
+
+        expect(singleSlicer.operation.length).toEqual(1);
+        expect(typeof singleSlicer.operation[0]).toEqual('function');
+
+        const multiSlicers = await opTest.init({ executionConfig: executionConfig2 });
+
+        expect(multiSlicers.operation.length).toEqual(2);
+        expect(typeof multiSlicers.operation[0]).toEqual('function');
+        expect(typeof multiSlicers.operation[1]).toEqual('function');   
     });
 
-    it('it produces values', (done) => {
-        const retryData = [];
-        const job1 = {
-            config: {
-                slicers: 1,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b'],
-                    size: 200
-                }]
-            }
+    it('it produces values', async () => {
+        const executionConfig = {
+            slicers: 1,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                size: 200
+            }]
         };
-        [_opConfig] = job1.config.operations;
+        const client = new MockClient();
+        const test = await opTest.init({ executionConfig, client });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then(slicers => Promise.resolve(slicers[0]())
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#b*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then(results => expect(results).toEqual(null)))
-            .catch((err) => {
-                fail(err);
-            })
-            .finally(done);
+        const slice1 = await test.run();
+        expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
+
+        const slice2 = await test.run();
+        expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
+
+        const slice3 = await test.run();
+        expect(slice3).toEqual(null);
     });
 
-    it('it produces values starting at a specific depth', (done) => {
-        const retryData = [];
-        const job1 = {
-            config: {
-                slicers: 1,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b', 'c', 'd'],
-                    starting_key_depth: 3,
-                    size: 200
-                }]
-            }
+    it('it produces values starting at a specific depth', async () => {
+        const executionConfig = {
+            slicers: 1,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b', 'c', 'd'],
+                starting_key_depth: 3,
+                size: 200
+            }]
         };
-        [_opConfig] = job1.config.operations;
+        const client = new MockClient();
+        const test = await opTest.init({ executionConfig, client });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then(slicers => Promise.resolve(slicers[0]())
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a00*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a01*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then(results => expect(results).toEqual({ count: 100, key: 'events-#a02*' })))
-            .catch(fail)
-            .finally(done);
+        const slice1 = await test.run();
+        expect(slice1).toEqual({ count: 100, key: 'events-#a00*' });
+
+        const slice2 = await test.run();
+        expect(slice2).toEqual({ count: 100, key: 'events-#a01*' });
+
+        const slice3 = await test.run();
+        expect(slice3).toEqual({ count: 100, key: 'events-#a02*' });
     });
 
-    it('it produces values even with an initial search error', (done) => {
-        const retryData = [];
-        const job1 = {
-            config: {
-                slicers: 1,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b'],
-                    size: 200
-                }]
-            }
+    it('it produces values even with an initial search error', async () => {
+        const executionConfig = {
+            slicers: 1,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                size: 200
+            }]
         };
-        [_opConfig] = job1.config.operations;
+        const client = new MockClient();
+        const { sequence } = client;
+        
+        sequence.pop();
+        client.sequence = [
+            { _shards: {
+                    failed: 1,
+                    failures: [{ reason: { type: 'some Error' } }]
+                }
+            },
+            ...sequence
+        ];
+           
+        const test = await opTest.init({ executionConfig, client });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then((slicers) => {
-                makeSearchFailure = true;
-                return Promise.resolve(slicers[0]())
-                    .then((results) => {
-                        expect(results).toBeDefined();
-                        expect(results).toEqual({ count: 100, key: 'events-#a*' });
-                        makeSearchFailure = false;
-                        return Promise.resolve(slicers[0]());
-                    })
-                    .then((results) => {
-                        expect(results).toEqual({ count: 100, key: 'events-#b*' });
-                        return Promise.resolve(slicers[0]());
-                    })
-                    .then(results => expect(results).toEqual(null))
-                    .catch(fail)
-                    .finally(done);
-            });
+        const slice1 = await test.run();
+        expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
+
+        const slice2 = await test.run();
+        expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
+
+        const slice3 = await test.run();
+        expect(slice3).toEqual(null);
     });
 
-    it('key range gets divided up by number of slicers', (done) => {
-        const retryData = [];
-        const job1 = {
-            config: {
+    it('key range gets divided up by number of slicers', async () => {
+        const executionConfig = {
                 slicers: 2,
                 operations: [{
                     _op: 'id_reader',
@@ -268,39 +179,30 @@ describe('id_reader', () => {
                     key_range: ['a', 'b'],
                     size: 200
                 }]
-            }
         };
 
-        [_opConfig] = job1.config.operations;
+        const client = new MockClient();
+        const test = await opTest.init({ executionConfig, client });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then(slicers => Promise.all([slicers[0](), slicers[1]()])
-                .then((results) => {
-                    expect(results[0]).toEqual({ count: 100, key: 'events-#a*' });
-                    expect(results[1]).toEqual({ count: 100, key: 'events-#b*' });
-                    return Promise.all([slicers[0](), slicers[1]()]);
-                })
-                .then((results) => {
-                    expect(results[0]).toEqual(null);
-                    expect(results[1]).toEqual(null);
-                }))
-            .catch(fail)
-            .finally(done);
+        const slices1 = await test.run();
+        expect(slices1[0]).toEqual({ count: 100, key: 'events-#a*' });
+        expect(slices1[1]).toEqual({ count: 100, key: 'events-#b*' });
+        
+        const slices2 = await test.run();
+        expect(slices2[0]).toEqual(null);
+        expect(slices2[1]).toEqual(null);
     });
 
-    it('key range gets divided up by number of slicers', (done) => {
-        clientData = [
-            { hits: { total: 100 } },
-            { hits: { total: 500 } },
-            { hits: { total: 200 } },
-            { hits: { total: 100 } },
-            { hits: { total: 100 } }
+    it('key range gets divided up by number of slicers', async () => {
+        const newSequence = [
+            {  _shards: { failed: 0 }, hits: { total: 100 } },
+            {  _shards: { failed: 0 }, hits: { total: 500 } },
+            {  _shards: { failed: 0 }, hits: { total: 200 } },
+            {  _shards: { failed: 0 }, hits: { total: 200 } },
+            {  _shards: { failed: 0 }, hits: { total: 100 } }
         ];
 
-        const retryData = [];
-        const job1 = {
-            config: {
+        const executionConfig = {
                 slicers: 1,
                 operations: [{
                     _op: 'id_reader',
@@ -309,39 +211,30 @@ describe('id_reader', () => {
                     key_range: ['a', 'b'],
                     size: 200
                 }]
-            }
         };
+        const client = new MockClient();
+        client.sequence = newSequence;
+        const test = await opTest.init({ executionConfig, client });
 
-        [_opConfig] = job1.config.operations;
+        const slice1 = await test.run();
+        expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then(slicers => Promise.resolve(slicers[0]())
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#b00*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#b01*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#b02*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then(results => expect(results).toEqual({ count: 100, key: 'events-#b03*' })))
-            .catch(fail)
-            .finally(done);
+        const slice2 = await test.run();
+        expect(slice2).toEqual({ count: 200, key: 'events-#b0*' });
+
+        const slice3 = await test.run();
+        expect(slice3).toEqual({ count: 200, key: 'events-#b1*' });
+
+        const slice4 = await test.run();
+        expect(slice4).toEqual({ count: 100, key: 'events-#b2*' });
+
+        const slice5 = await test.run();
+        expect(slice5).toEqual(null);
     });
 
-    it('can return to previous position', (done) => {
+    it('can return to previous position', async () => {
         const retryData = [{ lastSlice: { key: 'events-#a6*' } }];
-        const job1 = {
-            config: {
+        const executionConfig = {
                 slicers: 1,
                 operations: [{
                     _op: 'id_reader',
@@ -350,35 +243,23 @@ describe('id_reader', () => {
                     key_range: ['a', 'b'],
                     size: 200
                 }]
-            }
         };
+        const client = new MockClient();
+        const test = await opTest.init({ executionConfig, client, retryData });
 
-        [_opConfig] = job1.config.operations;
+        const slice1 = await test.run();
+        expect(slice1).toEqual({ count: 100, key: 'events-#a7*' });
 
-        Promise.resolve()
-            .then(() => idReader.newSlicer(context, job1, retryData, logger))
-            .then(slicers => Promise.resolve(slicers[0]())
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a7*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a8*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#a9*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#aa*' });
-                    return Promise.resolve(slicers[0]());
-                })
-                .then((results) => {
-                    expect(results).toEqual({ count: 100, key: 'events-#ab*' });
-                    done();
-                }))
-            .catch(fail)
-            .finally(done);
+        const slice2 = await test.run();
+        expect(slice2).toEqual({ count: 100, key: 'events-#a8*' });
+
+        const slice3 = await test.run();
+        expect(slice3).toEqual({ count: 100, key: 'events-#a9*' });
+
+        const slice4 = await test.run();
+        expect(slice4).toEqual({ count: 100, key: 'events-#aa*' });
+
+        const slice5 = await test.run();
+        expect(slice5).toEqual({ count: 100, key: 'events-#ab*' });
     });
 });

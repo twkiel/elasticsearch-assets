@@ -365,7 +365,6 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
         // make sure that end of last segment is always correct
         const endingDate = end.format ? end.format(dateFormat) : moment(end).format(dateFormat);
         results[results.length - 1].end = endingDate;
-
         return results;
     }
 
@@ -500,7 +499,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
 
         return Promise.resolve(slicers);
     }
-
+    
     return elasticsearch.version()
         .then(() => getDates()
             .then((esDates) => {

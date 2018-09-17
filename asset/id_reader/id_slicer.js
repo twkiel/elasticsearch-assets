@@ -71,7 +71,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         function getKeySlice(query) {
             return getCountForKey(query)
                 .then((count) => {
-                    if (count >= opConfig.size) {
+                    if (count > opConfig.size) {
                         events.emit('slicer:slice:recursion');
                         return determineKeySlice(generator, false, rangeObj);
                     }

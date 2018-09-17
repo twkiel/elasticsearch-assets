@@ -87,7 +87,7 @@ function newProcessor(context, opConfig) {
         if (meta.create) return meta.create;
         if (meta.update) return meta.update;
         if (meta.delete) return meta.delete;
-
+        console.log('what is the meta', meta)
         throw new Error('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
     }
 
