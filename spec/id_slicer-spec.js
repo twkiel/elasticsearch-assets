@@ -8,6 +8,12 @@ const MockClient = require('./mock_client');
 
 describe('id_reader', () => {
     const opTest = harness(idReader);
+    let client;
+
+    beforeEach(() => {
+        client = new MockClient();
+        opTest.setClients([{ client, type: 'elasticsearch' }])
+      });
 
     it('has a schema, newSlicer and a newReader method, crossValidation', () => {
         const reader = idReader;
@@ -95,8 +101,7 @@ describe('id_reader', () => {
                 size: 200
             }]
         };
-        const client = new MockClient();
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
 
         const slice1 = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
@@ -120,8 +125,7 @@ describe('id_reader', () => {
                 size: 200
             }]
         };
-        const client = new MockClient();
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
 
         const slice1 = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a00*' });
@@ -144,7 +148,6 @@ describe('id_reader', () => {
                 size: 200
             }]
         };
-        const client = new MockClient();
         const { sequence } = client;
         
         sequence.pop();
@@ -157,7 +160,7 @@ describe('id_reader', () => {
             ...sequence
         ];
            
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
 
         const slice1 = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
@@ -181,8 +184,7 @@ describe('id_reader', () => {
                 }]
         };
 
-        const client = new MockClient();
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
 
         const slices1 = await test.run();
         expect(slices1[0]).toEqual({ count: 100, key: 'events-#a*' });
@@ -212,9 +214,9 @@ describe('id_reader', () => {
                     size: 200
                 }]
         };
-        const client = new MockClient();
+
         client.sequence = newSequence;
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
 
         const slice1 = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
@@ -244,8 +246,7 @@ describe('id_reader', () => {
                     size: 200
                 }]
         };
-        const client = new MockClient();
-        const test = await opTest.init({ executionConfig, client, retryData });
+        const test = await opTest.init({ executionConfig, retryData });
 
         const slice1 = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a7*' });

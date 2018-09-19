@@ -10,6 +10,12 @@ const eventEmitter = new events.EventEmitter();
 
 describe('elasticsearch_bulk', () => {
     const opTest = harness(esSender);
+    let client;
+
+    beforeEach(() => {
+        client = new MockClient();
+        opTest.setClients([{ client, type: 'elasticsearch' }])
+      });
 
     it('has both a newSender and schema method', () => {
         expect(esSender.newProcessor).toBeDefined();
@@ -33,8 +39,7 @@ describe('elasticsearch_bulk', () => {
 
     it('if no docs, returns a promise of passed in data', async () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 100, multisend: false };
-        const client = new MockClient();
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run([])
 
         expect(results).toEqual([]);
@@ -43,7 +48,6 @@ describe('elasticsearch_bulk', () => {
     it('does not split if the size is <= than 2 * size in opConfig', async () => {
         // usually each doc is paired with metadata, thus doubling the size of incoming array,
         // hence we double size
-        const client = new MockClient();
         const opConfig = { _op: 'elasticsearch_bulk', size: 50, multisend: false };
         const incData = [];
         
@@ -51,7 +55,7 @@ describe('elasticsearch_bulk', () => {
             incData.push({ index: 'some_index'}, { some: 'data' });
         }
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData)
 
         expect(results.length).toEqual(1);
@@ -61,7 +65,6 @@ describe('elasticsearch_bulk', () => {
     it('it does split if the size is greater than 2 * size in opConfig', async () => {
         // usually each doc is paired with metadata, thus doubling the size of incoming array,
         // hence we double size
-        const client = new MockClient();
         const opConfig = { _op: 'elasticsearch_bulk', size: 50, multisend: false };
         const incData = [];
 
@@ -69,7 +72,7 @@ describe('elasticsearch_bulk', () => {
             incData.push({ some: 'data' });
         }
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData)
 
         expect(results.length).toEqual(2);
@@ -78,12 +81,11 @@ describe('elasticsearch_bulk', () => {
     });
 
     it('it splits the array up properly when there are delete operations (not a typical doubling of data)', async () => {
-        const client = new MockClient();
         const opConfig = { _op: 'elasticsearch_bulk', size: 2, multisend: false };
         const incData = [{ create: {} }, { some: 'data' }, { update: {} }, { other: 'data' }, { delete: {} }, { index: {} }, { final: 'data' }];
         const copy = incData.slice();
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData)
 
         expect(results.length).toEqual(2);
@@ -92,7 +94,6 @@ describe('elasticsearch_bulk', () => {
     });
 
     it('multisend will send based off of _id ', async () => {
-        const client = new MockClient();
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -105,7 +106,7 @@ describe('elasticsearch_bulk', () => {
         const incData = [{ create: { _id: 'abc' } }, { some: 'data' }, { update: { _id: 'abc' } }, { other: 'data' }, { delete: { _id: 'abc' } }, { index: { _id: 'abc' } }, { final: 'data' }];
         const copy = incData.slice();
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData);
 
         expect(results.length).toEqual(1);
@@ -114,7 +115,6 @@ describe('elasticsearch_bulk', () => {
     });
 
     it('it can multisend to several places', async() => {
-        const client = new MockClient();
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -124,10 +124,17 @@ describe('elasticsearch_bulk', () => {
                 b: 'otherConnection'
             }
         };
+        const client1 = new MockClient();
+        const client2 = new MockClient();
+        opTest.setClients([
+            { client: client1, type: 'elasticsearch', endpoint: 'default' },
+            { client: client2, type: 'elasticsearch', endpoint: 'otherConnection' }
+        ])
+
         const incData = [{ create: { _id: 'abc' } }, { some: 'data' }, { update: { _id: 'abc' } }, { other: 'data' }, { delete: { _id: 'bc' } }, { index: { _id: 'bc' } }, { final: 'data' }];
         const copy = incData.slice();
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData);
 
         expect(results.length).toEqual(2);
@@ -137,7 +144,6 @@ describe('elasticsearch_bulk', () => {
     });
 
     it('multisend_index_append will change outgoing _id ', async () => {
-       const client = new MockClient();
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -150,7 +156,7 @@ describe('elasticsearch_bulk', () => {
         const incData = [{ create: { _id: 'abc' } }, { some: 'data' }, { update: { _id: 'abc' } }, { other: 'data' }, { delete: { _id: 'abc' } }, { index: { _id: 'abc' } }, { final: 'data' }];
         const copy = incData.slice();
 
-        const test = await opTest.init({ opConfig, client });
+        const test = await opTest.init({ opConfig });
         const results = await test.run(incData);
 
         expect(results.length).toEqual(1);

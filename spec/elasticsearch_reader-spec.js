@@ -9,6 +9,12 @@ const MockClient = require('./mock_client');
 
 describe('elasticsearch_reader', () => {
     const opTest = harness(elasticDateReader);
+    let client;
+
+    beforeEach(() => {
+        client = new MockClient();
+        opTest.setClients([{ client, type: 'elasticsearch' }])
+      });
 
     it('has a schema, newSlicer and a newReader method', () => {
         const reader = elasticDateReader;
@@ -155,9 +161,8 @@ describe('elasticsearch_reader', () => {
                 slicers: 1,
                 operations: [opConfig],
         };
-        const client = new MockClient();
 
-        const singleSlicer = await opTest.init({ executionConfig, client });
+        const singleSlicer = await opTest.init({ executionConfig });
         expect(typeof singleSlicer.operation[0]).toEqual('function');
         expect(singleSlicer.operation.length).toEqual(1);
 
@@ -182,9 +187,8 @@ describe('elasticsearch_reader', () => {
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
         let error;
 
-        const client = new MockClient();
         try {
-            const opTest = await opTest.init({ executionConfig, client });
+            const opTest = await opTest.init({ executionConfig });
         } catch(err) {
             error = err;
         }
@@ -267,7 +271,6 @@ describe('elasticsearch_reader', () => {
 
         async function waitForUpdate(opConfig, endDate) {
             const waitFor = () => new Promise(resolve => setTimeout(() => resolve(updatedConfig), 30))
-            const client = new MockClient();
             client.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }])
             const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
             const test = await opTest.init({ executionConfig, client });
@@ -305,11 +308,10 @@ describe('elasticsearch_reader', () => {
         };
 
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-        const client = new MockClient();
 
         // setting sequence data to an empty array to simulate a query with no results
         client.setSequenceData([])
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results).toEqual(null)
@@ -329,7 +331,6 @@ describe('elasticsearch_reader', () => {
         };
 
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };       
-        const client = new MockClient();
         // the last two data are not important here, they just need to exists as a response
         client.setSequenceData([
             { '@timestamp': firstDate },
@@ -337,7 +338,7 @@ describe('elasticsearch_reader', () => {
             { '@timestamp': laterDate },
             { '@timestamp': laterDate },
         ])
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
@@ -363,7 +364,6 @@ describe('elasticsearch_reader', () => {
         };
 
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-        const client = new MockClient();
         // first two objects are consumed for determining start and end dates,
         // a middleDate is used in recursion to split in half, so it needs two
 
@@ -385,7 +385,7 @@ describe('elasticsearch_reader', () => {
 
         opTest.events.on('slicer:slice:recursion', hasRecursedEvent);
 
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
@@ -422,7 +422,6 @@ describe('elasticsearch_reader', () => {
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
         // first two objects are consumed for determining start and end dates,
         // a middleDate is used in recursion to expand,
-        const client = new MockClient();
         client.setSequenceData([
             { '@timestamp': firstDate, count: 100 },
             { '@timestamp': endDate, count: 100 },
@@ -440,7 +439,7 @@ describe('elasticsearch_reader', () => {
 
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
 
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
@@ -475,7 +474,6 @@ describe('elasticsearch_reader', () => {
             interval: '5m',
         };
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-        const client = new MockClient();
         // first two objects are consumed for determining start and end dates,
         // the count of zero hits the expansion code, then it hits the 150 which is
         // above the size limit so it runs another recursive query
@@ -497,7 +495,7 @@ describe('elasticsearch_reader', () => {
 
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
 
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
@@ -531,7 +529,6 @@ describe('elasticsearch_reader', () => {
             interval: '3m',
         };
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-        const client = new MockClient();
 
         // first two objects are consumed for determining start and end dates,
         // the count of zero hits the expansion code, then it hits the 150 which is
@@ -557,7 +554,7 @@ describe('elasticsearch_reader', () => {
 
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
         
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
@@ -626,11 +623,10 @@ describe('elasticsearch_reader', () => {
             { '@timestamp': firstDateS, count: 100 },
             { '@timestamp': endDate, count: 100 }
         ]);
-       
-        const [slicerS, slicerMS] = await Promise.all([
-            opTest.init({ executionConfig: executionConfig1, client: client1 }),
-            opTest.init({ executionConfig: executionConfig2, client: client2 }),
-        ])
+
+        // Need to run them seperatly so they get a different client
+        const slicerS = await opTest.init({ executionConfig: executionConfig1, clients: [{ type: 'elasticsearch', client: client1 }] });
+        const slicerMS = await opTest.init({ executionConfig: executionConfig2, clients: [{ type: 'elasticsearch', client: client2 }] });
 
         const [resultsSecond, resultsMillisecond] = await Promise.all([slicerS.run(), slicerMS.run()])
 
@@ -664,7 +660,6 @@ describe('elasticsearch_reader', () => {
         };
         const hexadecimal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-        const client = new MockClient();        
         client.deepRecursiveResponseCount = 10;
         // first two objects are consumed for determining start and end dates,
         // a middleDate is used in recursion to expand,
@@ -682,7 +677,7 @@ describe('elasticsearch_reader', () => {
             { '@timestamp': endDate, count: 100 },
         ]);
 
-        const test = await opTest.init({ executionConfig, client });
+        const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
         hexadecimal.forEach((char, index) => {
