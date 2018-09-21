@@ -65,40 +65,6 @@ describe('elasticsearch index selector', () => {
         }).toThrowError('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');
     })
 
-        it('new processor will throw if other config options are not present with timeseries', async () => {
-        const op1 = { _op: 'elasticsearch_index_selector', timeseries: 'daily' };
-        const op2 = { _op: 'elasticsearch_index_selector', timeseries: 'monthly' };
-        let error1, error2;
-
-        try {
-            await opTest.init({ opConfig: op1 })
-        } catch(err) {
-           error1 = err.message;
-        }
-
-        try {
-            await opTest.init({ opConfig: op2 })
-        } catch(err) {
-            error2 = err.message;
-        }
-
-        expect(error1).toEqual('timeseries requires an index_prefix');
-        expect(error2).toEqual('timeseries requires an index_prefix');
-    });
-
-    it('new processor will throw if type is not specified when data is did not come from elasticsearch', async () => {
-        const opConfig = { _op: 'elasticsearch_index_selector', index: 'some_index'  };
-        let error;
-
-        try {
-            await opTest.processData(opConfig, opTest.data.arrayLike)
-        } catch(err) {
-           error = err;
-        }
-
-        expect(error).toEqual(new Error('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch'));
-    });
-
     it('newProcessor takes either an array or elasticsearch formatted data and returns an array', async () => {
         const opConfig = { _op: 'elasticsearch_index_selector', index: 'some_index', type: 'someType' };
 

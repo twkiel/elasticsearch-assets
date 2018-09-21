@@ -33,14 +33,14 @@
     ts-node "^7.0.1"
     typescript "^3.0.1"
 
-"@terascope/teraslice-op-test-harness@^1.1.0":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.1.1.tgz#00ba0fbb0f97f0578f8c295314bd64afd3bf6540"
+"@terascope/teraslice-op-test-harness@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.2.0.tgz#3301677488e866fec3f745de863c0ca8cd6d0e67"
   dependencies:
     "@terascope/job-components" "^0.4.1"
-    "@terascope/teraslice-types" "^0.1.1"
+    "@terascope/teraslice-types" "^0.2.0"
     bluebird "^3.5.2"
-    lodash "^4.17.4"
+    lodash "^4.17.11"
 
 "@terascope/teraslice-types@^0.1.1":
   version "0.1.1"
@@ -55,6 +55,21 @@
     debugnyan "^2.0.2"
     rimraf "^2.0.0"
     typescript "^3.0.1"
+
+"@terascope/teraslice-types@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-types/-/teraslice-types-0.2.0.tgz#720502ca24451c8ccd4495a7aef48009f0452772"
+  dependencies:
+    "@types/bunyan" "^1.8.4"
+    "@types/convict" "^4.2.0"
+    "@types/lodash" "^4.14.116"
+    "@types/node" "^10.9.4"
+    bunyan "^1.8.12"
+    convict "^4.3.2"
+    debugnyan "^2.0.2"
+    lodash "^4.17.11"
+    rimraf "^2.0.0"
+    typescript "^3.0.3"
 
 "@types/bunyan@^1.8.4":
   version "1.8.4"
@@ -90,6 +105,10 @@
 "@types/node@*", "@types/node@^10.7.1":
   version "10.9.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.4.tgz#0f4cb2dc7c1de6096055357f70179043c33e9897"
+
+"@types/node@^10.9.4":
+  version "10.10.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.10.2.tgz#2a55b8d66f6945efc5da38489774e551248aa169"
 
 abab@^2.0.0:
   version "2.0.0"
@@ -921,19 +940,11 @@ escodegen@^1.9.1:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-airbnb-base@^13.1.0:
+eslint-config-airbnb-base@^13.0.0:
   version "13.1.0"
   resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-13.1.0.tgz#b5a1b480b80dfad16433d6c4ad84e6605052c05c"
   dependencies:
     eslint-restricted-globals "^0.1.1"
-    object.assign "^4.1.0"
-    object.entries "^1.0.4"
-
-eslint-config-airbnb@^17.0.0:
-  version "17.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb/-/eslint-config-airbnb-17.1.0.tgz#3964ed4bc198240315ff52030bf8636f42bc4732"
-  dependencies:
-    eslint-config-airbnb-base "^13.1.0"
     object.assign "^4.1.0"
     object.entries "^1.0.4"
 
@@ -989,9 +1000,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^5.0.1:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.5.0.tgz#8557fcceab5141a8197da9ffd9904f89f64425c6"
+eslint@^5.3.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.6.0.tgz#b6f7806041af01f71b3f1895cbb20971ea4b6223"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     ajv "^6.5.3"
@@ -2344,7 +2355,7 @@ lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
 
-lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5:
+lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.4, lodash@^4.17.5:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
 
@@ -3592,7 +3603,7 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^3.0.1:
+typescript@^3.0.1, typescript@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
 

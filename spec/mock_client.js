@@ -3,12 +3,12 @@
 class MockClient {
     constructor(_sequence) {
         const sequence = [
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } },
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } },
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } },
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } },
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } },
-            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _source: { '@timestamp': new Date() } }] } }
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
+            {  _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } }
         ];
         this.sequence = _sequence || sequence;
         this.indices = {};

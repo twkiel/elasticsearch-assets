@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@terascope/elasticsearch-api@^1.0.1":
+"@terascope/elasticsearch-api@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-1.1.1.tgz#87de959d443289c77cbd0a2131de3b71b6fc4b8a"
   dependencies:

@@ -66,7 +66,6 @@ describe('elasticsearch_reader', () => {
     });
 
     it('newReader returns a function that queries elasticsearch', async () => {
-
         const executionConfig = { 
             lifecycle: 'once',
              operations: [ {
@@ -94,33 +93,35 @@ describe('elasticsearch_reader', () => {
             }
         }
         const opConfig1 = {
+            _op: 'elasticsearch_reader',
             date_field_name: '@timestamp',
             size: 50,
-            index: 'someIndex'
+            index: 'someindex'
         };
         const opConfig2 = {
+            _op: 'elasticsearch_reader',
             date_field_name: '@timestamp',
             size: 50,
-            index: 'someIndex',
+            index: 'someindex',
             full_response: true
         };
         const opConfig3 = {
+            _op: 'elasticsearch_reader',
             date_field_name: '@timestamp',
             size: 50,
-            index: 'someIndex',
+            index: 'someindex',
             preserve_id: true
         };
         const jobConfig = { lifecycle: 'once' };
         const type = 'reader'
 
         const [reader1, reader2, reader3]= await Promise.all([
-            opTest.init({ executionConfig: makeConfig(opConfig1), type }),
-            opTest.init({ executionConfig: makeConfig(opConfig2), type }),
-            opTest.init({ executionConfig: makeConfig(opConfig3), type })
-        ])
-    
-        const msg = { count: 100, start: firstDate.format(), end: laterDate.format()}
+            opTest.init({ opConfig: opConfig1, type }),
+            opTest.init({ opConfig: opConfig2, type }),
+            opTest.init({ opConfig: opConfig3, type })
+        ]);
 
+        const msg = { count: 100, start: firstDate.format(), end: laterDate.format()}
         const response1 = [];
         const response2 = {"_shards":{"failed":0},"hits":{"total":100,"hits":[{"_source":{"@timestamp":"2018-08-24T19:09:48.134Z","count":100}}]}};
 
