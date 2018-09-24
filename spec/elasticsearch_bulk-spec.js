@@ -86,8 +86,8 @@ describe('elasticsearch_bulk', () => {
         const results = await test.run(incData);
 
         expect(results.length).toEqual(2);
-        expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy.slice(0, 5)));
-        expect(JSON.stringify(results[1].body)).toEqual(JSON.stringify(copy.slice(5)));
+        expect(results[0].body).toEqual(copy.slice(0, 5));
+        expect(results[1].body).toEqual(copy.slice(5));
     });
 
     it('multisend will send based off of _id ', async () => {
@@ -108,7 +108,7 @@ describe('elasticsearch_bulk', () => {
 
         expect(results.length).toEqual(1);
         // length to index is off by 1
-        expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy));
+        expect(results[0].body).toEqual(copy);
     });
 
     it('it can multisend to several places', async () => {
@@ -158,7 +158,7 @@ describe('elasticsearch_bulk', () => {
 
         expect(results.length).toEqual(1);
         // length to index is off by 1
-        expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy));
+        expect(results[0].body).toEqual(copy);
     });
 
     it('crossValidation makes sure connection_map is configured in sysconfig', () => {
