@@ -26,7 +26,7 @@
     "url": "git+https://github.com/jsnoble/elasticsearch-assets.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jsnoble/elasticsearch-assets/issues"
   },

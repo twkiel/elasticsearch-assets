@@ -136,8 +136,8 @@ describe('elasticsearch_bulk', () => {
 
         expect(results.length).toEqual(2);
         // length to index is off by 1
-        expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy.slice(0, 4)));
-        expect(JSON.stringify(results[1].body)).toEqual(JSON.stringify(copy.slice(4)));
+        expect(results[0].body).toEqual(copy.slice(0, 4));
+        expect(results[1].body).toEqual(copy.slice(4));
     });
 
     it('multisend_index_append will change outgoing _id ', async () => {
