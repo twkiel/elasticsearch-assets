@@ -6,13 +6,17 @@ const elasticApi = require('@terascope/elasticsearch-api');
 const { getClient, getOpConfig } = require('../utils');
 
 function newProcessor(context, opConfig) {
-    const { connection_map: connectionMap, multisend_index_append: multisendIndexAppend, size: limit } = opConfig;
+    const {
+        connection_map: connectionMap,
+        multisend_index_append: multisendIndexAppend,
+        size: limit
+    } = opConfig;
     const bulkContexts = {};
 
     let logger;
     let client;
     let { multisend } = opConfig;
-   
+
     if (multisend) {
         _initializeContexts();
     } else {
@@ -87,7 +91,6 @@ function newProcessor(context, opConfig) {
         if (meta.create) return meta.create;
         if (meta.update) return meta.update;
         if (meta.delete) return meta.delete;
-        console.log('what is the meta', meta)
         throw new Error('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
     }
 
@@ -169,8 +172,8 @@ function schema() {
     // as well as the correct client from system config
     return {
         size: {
-            doc: 'the maximum number of docs it will take at a time, anything past it will be split up and sent' +
-            'note that the value should be even, the first doc will be the index data and then the next is the data',
+            doc: 'the maximum number of docs it will take at a time, anything past it will be split up and sent'
+            + 'note that the value should be even, the first doc will be the index data and then the next is the data',
             default: 500,
             format(val) {
                 if (isNaN(val)) {
@@ -181,24 +184,24 @@ function schema() {
             }
         },
         connection_map: {
-            doc: 'Mapping from ID prefix to connection names. Routes data to multiple clusters ' +
-            'based on the incoming key. Used when multisend is set to true. The key name can be a ' +
-            'comma separated list of prefixes that will map to the same connection. Prefixes matching takes ' +
-            'the first character of the key.',
+            doc: 'Mapping from ID prefix to connection names. Routes data to multiple clusters '
+            + 'based on the incoming key. Used when multisend is set to true. The key name can be a '
+            + 'comma separated list of prefixes that will map to the same connection. Prefixes matching takes '
+            + 'the first character of the key.',
             default: {
                 '*': 'default'
             },
             format: Object
         },
         multisend: {
-            doc: 'When set to true the connection_map will be used allocate the data stream across multiple ' +
-            'connections based on the keys of the incoming documents.',
+            doc: 'When set to true the connection_map will be used allocate the data stream across multiple '
+            + 'connections based on the keys of the incoming documents.',
             default: false,
             format: Boolean
         },
         multisend_index_append: {
-            doc: 'When set to true will append the connection_map prefixes to the name of the index ' +
-            'before data is submitted.',
+            doc: 'When set to true will append the connection_map prefixes to the name of the index '
+            + 'before data is submitted.',
             default: false,
             format: Boolean
         },
@@ -214,7 +217,8 @@ function crossValidation(job, sysconfig) {
     const opConfig = getOpConfig(job, 'elasticsearch_bulk');
     const elasticConnectors = sysconfig.terafoundation.connectors.elasticsearch;
 
-    // check to verify if connection map provided is consistent with sysconfig.terafoundation.connectors
+    // check to verify if connection map provided is
+    // consistent with sysconfig.terafoundation.connectors
     if (opConfig.multisend) {
         _.forOwn(opConfig.connection_map, (value) => {
             if (!elasticConnectors[value]) {

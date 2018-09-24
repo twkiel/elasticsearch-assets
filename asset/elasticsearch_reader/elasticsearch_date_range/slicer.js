@@ -109,7 +109,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                 }
 
                 if (data[opConfig.date_field_name] === undefined) {
-                    return Promise.reject(`date_field_name: "${opConfig.date_field_name}" for index: ${opConfig.index} does not exist, data: ${JSON.stringify(data)}, results: ${JSON.stringify(results)}`);
+                    throw new Error(`date_field_name: "${opConfig.date_field_name}" for index: ${opConfig.index} does not exist, data: ${JSON.stringify(data)}, results: ${JSON.stringify(results)}`);
                 }
 
                 if (givenDate) {
@@ -499,7 +499,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
 
         return Promise.resolve(slicers);
     }
-    
+
     return elasticsearch.version()
         .then(() => getDates()
             .then((esDates) => {

@@ -1,10 +1,8 @@
 'use strict';
 
-const Promise = require('bluebird');
-const events = require('events');
-const idReader = require('../asset/id_reader');
 const harness = require('@terascope/teraslice-op-test-harness');
 const MockClient = require('./mock_client');
+const idReader = require('../asset/id_reader');
 
 describe('id_reader', () => {
     const opTest = harness(idReader);
@@ -12,8 +10,8 @@ describe('id_reader', () => {
 
     beforeEach(() => {
         client = new MockClient();
-        opTest.setClients([{ client, type: 'elasticsearch' }])
-      });
+        opTest.setClients([{ client, type: 'elasticsearch' }]);
+    });
 
     it('has a schema, newSlicer and a newReader method, crossValidation', () => {
         const reader = idReader;
@@ -68,10 +66,9 @@ describe('id_reader', () => {
     });
 
     it('can create multiple slicers', async () => {
-        const retryData = [];
         const executionConfig1 = {
-                slicers: 1,
-                operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
+            slicers: 1,
+            operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
         };
         const executionConfig2 = {
             slicers: 2,
@@ -87,7 +84,7 @@ describe('id_reader', () => {
 
         expect(multiSlicers.operation.length).toEqual(2);
         expect(typeof multiSlicers.operation[0]).toEqual('function');
-        expect(typeof multiSlicers.operation[1]).toEqual('function');   
+        expect(typeof multiSlicers.operation[1]).toEqual('function');
     });
 
     it('it produces values', async () => {
@@ -149,17 +146,17 @@ describe('id_reader', () => {
             }]
         };
         const { sequence } = client;
-        
+
         sequence.pop();
-        client.sequence = [
-            { _shards: {
-                    failed: 1,
-                    failures: [{ reason: { type: 'some Error' } }]
-                }
-            },
-            ...sequence
+        client.sequence = [{
+            _shards: {
+                failed: 1,
+                failures: [{ reason: { type: 'some Error' } }]
+            }
+        },
+        ...sequence
         ];
-           
+
         const test = await opTest.init({ executionConfig });
 
         const slice1 = await test.run();
@@ -174,14 +171,14 @@ describe('id_reader', () => {
 
     it('key range gets divided up by number of slicers', async () => {
         const executionConfig = {
-                slicers: 2,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b'],
-                    size: 200
-                }]
+            slicers: 2,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                size: 200
+            }]
         };
 
         const test = await opTest.init({ executionConfig });
@@ -189,7 +186,7 @@ describe('id_reader', () => {
         const slices1 = await test.run();
         expect(slices1[0]).toEqual({ count: 100, key: 'events-#a*' });
         expect(slices1[1]).toEqual({ count: 100, key: 'events-#b*' });
-        
+
         const slices2 = await test.run();
         expect(slices2[0]).toEqual(null);
         expect(slices2[1]).toEqual(null);
@@ -197,22 +194,22 @@ describe('id_reader', () => {
 
     it('key range gets divided up by number of slicers', async () => {
         const newSequence = [
-            {  _shards: { failed: 0 }, hits: { total: 100 } },
-            {  _shards: { failed: 0 }, hits: { total: 500 } },
-            {  _shards: { failed: 0 }, hits: { total: 200 } },
-            {  _shards: { failed: 0 }, hits: { total: 200 } },
-            {  _shards: { failed: 0 }, hits: { total: 100 } }
+            { _shards: { failed: 0 }, hits: { total: 100 } },
+            { _shards: { failed: 0 }, hits: { total: 500 } },
+            { _shards: { failed: 0 }, hits: { total: 200 } },
+            { _shards: { failed: 0 }, hits: { total: 200 } },
+            { _shards: { failed: 0 }, hits: { total: 100 } }
         ];
 
         const executionConfig = {
-                slicers: 1,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b'],
-                    size: 200
-                }]
+            slicers: 1,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                size: 200
+            }]
         };
 
         client.sequence = newSequence;
@@ -237,14 +234,14 @@ describe('id_reader', () => {
     it('can return to previous position', async () => {
         const retryData = [{ lastSlice: { key: 'events-#a6*' } }];
         const executionConfig = {
-                slicers: 1,
-                operations: [{
-                    _op: 'id_reader',
-                    type: 'events-',
-                    key_type: 'hexadecimal',
-                    key_range: ['a', 'b'],
-                    size: 200
-                }]
+            slicers: 1,
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                size: 200
+            }]
         };
         const test = await opTest.init({ executionConfig, retryData });
 

@@ -3,9 +3,10 @@
 const Promise = require('bluebird');
 const moment = require('moment');
 const _ = require('lodash');
-const elasticDateReader = require('../asset/elasticsearch_reader');
 const harness = require('@terascope/teraslice-op-test-harness');
+const elasticDateReader = require('../asset/elasticsearch_reader');
 const MockClient = require('./mock_client');
+
 
 describe('elasticsearch_reader', () => {
     const opTest = harness(elasticDateReader);
@@ -13,8 +14,8 @@ describe('elasticsearch_reader', () => {
 
     beforeEach(() => {
         client = new MockClient();
-        opTest.setClients([{ client, type: 'elasticsearch' }])
-      });
+        opTest.setClients([{ client, type: 'elasticsearch' }]);
+    });
 
     it('has a schema, newSlicer and a newReader method', () => {
         const reader = elasticDateReader;
@@ -66,9 +67,9 @@ describe('elasticsearch_reader', () => {
     });
 
     it('newReader returns a function that queries elasticsearch', async () => {
-        const executionConfig = { 
+        const executionConfig = {
             lifecycle: 'once',
-             operations: [ {
+            operations: [{
                 _op: 'elasticsearch_reader',
                 date_field_name: '@timestamp',
                 size: 50,
@@ -86,12 +87,7 @@ describe('elasticsearch_reader', () => {
     it('newReader can return formated data', async () => {
         const firstDate = moment();
         const laterDate = moment(firstDate).add(5, 'm');
-        function makeConfig(op){
-            return {
-                lifecycle: 'once',
-                operations: [op]
-            }
-        }
+
         const opConfig1 = {
             _op: 'elasticsearch_reader',
             date_field_name: '@timestamp',
@@ -112,18 +108,15 @@ describe('elasticsearch_reader', () => {
             index: 'someindex',
             preserve_id: true
         };
-        const jobConfig = { lifecycle: 'once' };
-        const type = 'reader'
+        const type = 'reader';
 
-        const [reader1, reader2, reader3]= await Promise.all([
+        const [reader1, reader2, reader3] = await Promise.all([
             opTest.init({ opConfig: opConfig1, type }),
             opTest.init({ opConfig: opConfig2, type }),
             opTest.init({ opConfig: opConfig3, type })
         ]);
 
-        const msg = { count: 100, start: firstDate.format(), end: laterDate.format()}
-        const response1 = [];
-        const response2 = {"_shards":{"failed":0},"hits":{"total":100,"hits":[{"_source":{"@timestamp":"2018-08-24T19:09:48.134Z","count":100}}]}};
+        const msg = { count: 100, start: firstDate.format(), end: laterDate.format() };
 
         const [results1, results2, results3] = await Promise.all([
             reader1.run(msg),
@@ -139,7 +132,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.hits.hits).toBeDefined();
         expect(Array.isArray(results2.hits.hits)).toEqual(true);
         expect(results2.hits.hits[0]._id).toEqual('someId');
-        
+
         expect(Array.isArray(results3)).toEqual(true);
         expect(results3.hits).toEqual(undefined);
         expect(typeof results3[0]).toEqual('object');
@@ -158,9 +151,9 @@ describe('elasticsearch_reader', () => {
             end: new Date()
         };
         const executionConfig = {
-                lifecycle: 'once',
-                slicers: 1,
-                operations: [opConfig],
+            lifecycle: 'once',
+            slicers: 1,
+            operations: [opConfig],
         };
 
         const singleSlicer = await opTest.init({ executionConfig });
@@ -189,11 +182,11 @@ describe('elasticsearch_reader', () => {
         let error;
 
         try {
-            const opTest = await opTest.init({ executionConfig });
-        } catch(err) {
+            await opTest.init({ executionConfig });
+        } catch (err) {
             error = err;
         }
-        
+
         expect(error instanceof Error).toEqual(true);
     });
 
@@ -266,15 +259,13 @@ describe('elasticsearch_reader', () => {
             end: moment(laterDate).add(1, 's').format()
         };
 
-        const executionConfig = { lifecycle: 'once', slicers: 1, operations: [_.cloneDeep(opConfig)] };
-
         opTest.events.on('slicer:execution:update', checkUpdate);
 
-        async function waitForUpdate(opConfig, endDate) {
-            const waitFor = () => new Promise(resolve => setTimeout(() => resolve(updatedConfig), 30))
-            client.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }])
-            const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
-            const test = await opTest.init({ executionConfig, client });
+        async function waitForUpdate(config, endDate) {
+            const waitFor = () => new Promise(r => setTimeout(() => r(updatedConfig), 30));
+            client.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }]);
+            const executionConfig = { lifecycle: 'once', slicers: 1, operations: [config] };
+            await opTest.init({ executionConfig, client });
             return waitFor();
         }
 
@@ -311,11 +302,11 @@ describe('elasticsearch_reader', () => {
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
 
         // setting sequence data to an empty array to simulate a query with no results
-        client.setSequenceData([])
+        client.setSequenceData([]);
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
-        expect(results).toEqual(null)
+        expect(results).toEqual(null);
     });
 
     it('slicer can produce date slices', async () => {
@@ -331,14 +322,14 @@ describe('elasticsearch_reader', () => {
             interval: '2hrs'
         };
 
-        const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };       
+        const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
         // the last two data are not important here, they just need to exists as a response
         client.setSequenceData([
             { '@timestamp': firstDate },
             { '@timestamp': laterDate },
             { '@timestamp': laterDate },
             { '@timestamp': laterDate },
-        ])
+        ]);
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
@@ -347,7 +338,7 @@ describe('elasticsearch_reader', () => {
         expect(results.count).toEqual(100);
 
         const results2 = await test.run();
-        expect(results2).toEqual(null)
+        expect(results2).toEqual(null);
     });
 
     it('slicer can reduce date slices down to size', async () => {
@@ -402,7 +393,7 @@ describe('elasticsearch_reader', () => {
 
         const results3 = await test.run();
 
-        expect(results3).toEqual(null)
+        expect(results3).toEqual(null);
 
         opTest.events.removeListener('slicer:slice:recursion', hasRecursedEvent);
     });
@@ -455,9 +446,9 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null)
+        expect(results3).toEqual(null);
 
-        opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn)
+        opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
 
     it('slicer can do expansion of date slices with large slices', async () => {
@@ -510,9 +501,9 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null)
+        expect(results3).toEqual(null);
 
-        opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn)
+        opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
 
     it('slicer can expand date slices properly in uneven data distribution', async () => {
@@ -554,7 +545,7 @@ describe('elasticsearch_reader', () => {
         }
 
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
-        
+
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
@@ -578,7 +569,7 @@ describe('elasticsearch_reader', () => {
         const results5 = await test.run();
 
         expect(results5).toEqual(null);
-        
+
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
 
@@ -611,7 +602,7 @@ describe('elasticsearch_reader', () => {
         const executionConfig2 = { lifecycle: 'once', slicers: 1, operations: [opConfig2] };
         const client1 = new MockClient();
         const client2 = new MockClient();
-        
+
         client1.deepRecursiveResponseCount = 100;
         client2.deepRecursiveResponseCount = 100;
         // first two objects are consumed for determining start and end dates,
@@ -629,18 +620,18 @@ describe('elasticsearch_reader', () => {
         const slicerS = await opTest.init({ executionConfig: executionConfig1, clients: [{ type: 'elasticsearch', client: client1 }] });
         const slicerMS = await opTest.init({ executionConfig: executionConfig2, clients: [{ type: 'elasticsearch', client: client2 }] });
 
-        const [resultsSecond, resultsMillisecond] = await Promise.all([slicerS.run(), slicerMS.run()])
+        const [resultsS, resultsMS] = await Promise.all([slicerS.run(), slicerMS.run()]);
 
-        const startMsIsSame = moment(resultsMillisecond.start).isSame(moment(firstDateMS));
-        const endMsIsSame = moment(resultsMillisecond.end).isSame(moment(closingDateMS));
+        const startMsIsSame = moment(resultsMS.start).isSame(moment(firstDateMS));
+        const endMsIsSame = moment(resultsMS.end).isSame(moment(closingDateMS));
 
-        expect(resultsSecond.start).toEqual(firstDateS.format());
-        expect(resultsSecond.end).toEqual(closingDateS.format());
-        expect(resultsSecond.count).toEqual(100);
+        expect(resultsS.start).toEqual(firstDateS.format());
+        expect(resultsS.end).toEqual(closingDateS.format());
+        expect(resultsS.count).toEqual(100);
 
         expect(startMsIsSame).toEqual(true);
         expect(endMsIsSame).toEqual(true);
-        expect(resultsMillisecond.count).toEqual(100);
+        expect(resultsMS.count).toEqual(100);
     });
 
     it('slicer can will recurse down to smallest factor and subslice by key', async () => {

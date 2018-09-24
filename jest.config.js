@@ -3,7 +3,7 @@
 module.exports = {
     rootDir: '.',
     testMatch: [
-        '<rootDir>/spec/*-spec.{ts,js}',
+        '<rootDir>/spec/*-spec.js'
     ],
     collectCoverage: true,
     collectCoverageFrom: [

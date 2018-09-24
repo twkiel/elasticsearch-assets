@@ -28,7 +28,7 @@ describe('simple_api_reader', () => {
 
     beforeEach(() => {
         timeout = null;
-    })
+    });
 
     const data = {
         results: [{ _source: { some: 'data' } }],
@@ -94,11 +94,11 @@ describe('simple_api_reader', () => {
             allRequests.push(query.uri);
             return new Promise((resolve) => {
                 if (!timeout) resolve(data);
-            
+
                 setTimeout(() => {
-                    resolve(data)
+                    resolve(data);
                 }, timeout);
-            })
+            });
         },
         logger: {
             error: () => {},
@@ -170,24 +170,38 @@ describe('simple_api_reader', () => {
         };
 
         const sort2 = {
-            "date": {
-                "order":"asc"
+            date: {
+                order: 'asc'
             }
         };
 
         const queryOpConfig = Object.assign({}, opConfig, { query: 'test:query' });
         const geoOpConfig = Object.assign({}, opConfig2, { query: 'test:query' });
+        const queryArgs1 = [luceneQuery, rangeQuery];
+        const queryArgs2 = [luceneQuery, rangeQuery, geoQuery];
 
         const query1 = makeQuery(opConfig, { count: 100 }, rangeQuery);
-        const query2 = makeQuery(queryOpConfig, { count: 100 }, [luceneQuery, rangeQuery]);
-        const query3 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery], sort1);
-        const query4 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery]);
-        const query5 = makeQuery(geoOpConfig, { count: 100 }, [luceneQuery, rangeQuery, geoQuery], sort2);
-        const query6 = {"index":"details-subset","size":5000,"body":{"sort":[{"created":{"order":"asc"}}]},"q":"bytes:>=2000"};
+        const query2 = makeQuery(queryOpConfig, { count: 100 }, queryArgs1);
+
+        const query3 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2, sort1);
+        const query4 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2);
+        const query5 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2, sort2);
+        const query6 = {
+            index: 'details-subset',
+            size: 5000,
+            body: {
+                sort: [{
+                    created: {
+                        order: 'asc'
+                    }
+                }]
+            },
+            q: 'bytes:>=2000'
+        };
 
         const url1 = 'https://localhost:8000/details-subset?token=test-token&q=date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url2 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
-        const url3 ='https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&geo_box_top_left=34.5234,79.42345&geo_box_bottom_right=54.5234,80.3456&geo_sort_point=52.3456,79.6784';
+        const url3 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&geo_box_top_left=34.5234,79.42345&geo_box_bottom_right=54.5234,80.3456&geo_sort_point=52.3456,79.6784';
         const url4 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&geo_point=52.3456,79.6784&geo_distance=200km';
         const url5 = 'https://localhost:8000/details-subset?token=test-token&q=test:query AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100&sort=date:asc&geo_point=52.3456,79.6784&geo_distance=200km';
         const url6 = 'https://localhost:8000/details-subset?token=test-token&q=bytes:>=2000&size=5000';
@@ -217,7 +231,7 @@ describe('simple_api_reader', () => {
             .then(() => {
                 const url = allRequests.pop();
                 expect(url).toEqual(url5);
-                return client4.search(query6)
+                return client4.search(query6);
             })
             .then(() => {
                 const url = allRequests.pop();
@@ -227,7 +241,7 @@ describe('simple_api_reader', () => {
             .finally(done);
     });
 
-   it('request can timeout properly', (done) => {
+    it('request can timeout properly', (done) => {
         const client = processor.createClient(context, opConfig);
         timeout = 75;
 

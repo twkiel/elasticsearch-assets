@@ -1,12 +1,9 @@
 'use strict';
 
-const events = require('events');
-const Promise = require('bluebird');
 const harness = require('@terascope/teraslice-op-test-harness');
 const esSender = require('../asset/elasticsearch_bulk');
 const MockClient = require('./mock_client');
 
-const eventEmitter = new events.EventEmitter();
 
 describe('elasticsearch_bulk', () => {
     const opTest = harness(esSender);
@@ -14,8 +11,8 @@ describe('elasticsearch_bulk', () => {
 
     beforeEach(() => {
         client = new MockClient();
-        opTest.setClients([{ client, type: 'elasticsearch' }])
-      });
+        opTest.setClients([{ client, type: 'elasticsearch' }]);
+    });
 
     it('has both a newSender and schema method', () => {
         expect(esSender.newProcessor).toBeDefined();
@@ -33,14 +30,14 @@ describe('elasticsearch_bulk', () => {
 
     it('returns a function', async () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 100, multisend: false };
-        const test = await opTest.init(opConfig)
+        const test = await opTest.init(opConfig);
         expect(typeof test.operation).toEqual('function');
     });
 
     it('if no docs, returns a promise of passed in data', async () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 100, multisend: false };
         const test = await opTest.init({ opConfig });
-        const results = await test.run([])
+        const results = await test.run([]);
 
         expect(results).toEqual([]);
     });
@@ -50,13 +47,13 @@ describe('elasticsearch_bulk', () => {
         // hence we double size
         const opConfig = { _op: 'elasticsearch_bulk', size: 50, multisend: false };
         const incData = [];
-        
+
         for (let i = 0; i < 50; i += 1) {
-            incData.push({ index: 'some_index'}, { some: 'data' });
+            incData.push({ index: 'some_index' }, { some: 'data' });
         }
 
         const test = await opTest.init({ opConfig });
-        const results = await test.run(incData)
+        const results = await test.run(incData);
 
         expect(results.length).toEqual(1);
         expect(results[0].body.length).toEqual(100);
@@ -73,7 +70,7 @@ describe('elasticsearch_bulk', () => {
         }
 
         const test = await opTest.init({ opConfig });
-        const results = await test.run(incData)
+        const results = await test.run(incData);
 
         expect(results.length).toEqual(2);
         expect(results[0].body.length).toEqual(101);
@@ -86,7 +83,7 @@ describe('elasticsearch_bulk', () => {
         const copy = incData.slice();
 
         const test = await opTest.init({ opConfig });
-        const results = await test.run(incData)
+        const results = await test.run(incData);
 
         expect(results.length).toEqual(2);
         expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy.slice(0, 5)));
@@ -114,7 +111,7 @@ describe('elasticsearch_bulk', () => {
         expect(JSON.stringify(results[0].body)).toEqual(JSON.stringify(copy));
     });
 
-    it('it can multisend to several places', async() => {
+    it('it can multisend to several places', async () => {
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -129,7 +126,7 @@ describe('elasticsearch_bulk', () => {
         opTest.setClients([
             { client: client1, type: 'elasticsearch', endpoint: 'default' },
             { client: client2, type: 'elasticsearch', endpoint: 'otherConnection' }
-        ])
+        ]);
 
         const incData = [{ create: { _id: 'abc' } }, { some: 'data' }, { update: { _id: 'abc' } }, { other: 'data' }, { delete: { _id: 'bc' } }, { index: { _id: 'bc' } }, { final: 'data' }];
         const copy = incData.slice();

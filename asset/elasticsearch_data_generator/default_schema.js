@@ -51,6 +51,7 @@ module.exports = function module(opConfig, otherSchema) {
         const reg = { randexp: '' };
 
         if (type === 'base64url') {
+            // eslint-disable-next-line
             reg.randexp = '[a-zA-Z1-9\-\_]\w{8}';
         }
         if (type === 'hexadecimal') {

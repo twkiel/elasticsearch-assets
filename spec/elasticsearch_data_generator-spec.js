@@ -1,8 +1,8 @@
 'use strict';
 
-const generator = require('../asset/elasticsearch_data_generator');
 const Promise = require('bluebird');
 const harness = require('@terascope/teraslice-op-test-harness');
+const generator = require('../asset/elasticsearch_data_generator');
 
 describe('elasticsearch_data_generator', () => {
     const opTest = harness(generator);
@@ -21,21 +21,21 @@ describe('elasticsearch_data_generator', () => {
         const opConfig = { _op: 'elasticsearch_data_generator' };
         const test = await opTest.init({ opConfig, type: 'reader' });
 
-        const results = await test.run(1)
+        const results = await test.run(1);
         expect(results.length).toEqual(1);
         expect(Object.keys(results[0]).length).toBeGreaterThan(1);
     });
 
     it('slicer in "once" mode will return number based off total size ', async () => {
-        const opConfig = { _op: 'elasticsearch_data_generator', size: 13  };
+        const opConfig = { _op: 'elasticsearch_data_generator', size: 13 };
 
         const executionConfig1 = {
             lifecycle: 'once', operations: [{ _op: 'elasticsearch_data_generator', size: 13 }, { size: 5 }]
         };
         // if not specified size defaults to 5000
         const executionConfig2 = {
-                lifecycle: 'once',
-                operations: [{ _op: 'elasticsearch_data_generator', someKey: 'someValue', size: 13 }, { size: 5000 }]
+            lifecycle: 'once',
+            operations: [{ _op: 'elasticsearch_data_generator', someKey: 'someValue', size: 13 }, { size: 5000 }]
         };
         const test = await opTest.init({ opConfig, executionConfig: executionConfig1 });
         const test2 = await opTest.init({ opConfig, executionConfig: executionConfig2 });
@@ -66,15 +66,14 @@ describe('elasticsearch_data_generator', () => {
             test.run(),
             test.run(),
         ]);
-        
+
         expect(results1).toEqual(550);
         expect(results2).toEqual(550);
         expect(results3).toEqual(550);
     });
 
     it('data generator will only return one slicer', async () => {
-        const opConfig = { size: 550 };
-        const executionConfig = { lifecycle: 'persistent', slicers: 3, operations: [{ _op: 'elasticsearch_data_generator', size: 5 }]};
+        const executionConfig = { lifecycle: 'persistent', slicers: 3, operations: [{ _op: 'elasticsearch_data_generator', size: 5 }] };
 
         const test = await opTest.init({ executionConfig });
         expect(typeof test.operation[0]).toEqual('function');
