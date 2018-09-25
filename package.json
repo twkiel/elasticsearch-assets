@@ -4,8 +4,8 @@
   "version": "1.0.1",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint *.js",
-    "lint:fix": "eslint --fix *.js",
+    "lint": "eslint asset/**/*.js spec/**/*.js",
+    "lint:fix": "eslint --fix asset/**/*.js spec/**/*.js",
     "test": "jest",
     "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand"
   },
