@@ -1,6 +1,7 @@
 'use strict';
 
 const parseError = require('@terascope/error-parser');
+const fs = require('fs');
 
 function dateOptions(value) {
     const options = {
@@ -72,7 +73,7 @@ function retryModule(logger, numOfRetries) {
     };
 }
 
-// FIXME: this function is duplication of apis. Putting this in for 
+// FIXME: this function is duplication of apis. Putting this in for
 // backwards compatibility until that api is settled
 function getOpConfig(job, name) {
     return job.operations.find(op => op._op === name);
@@ -87,7 +88,8 @@ function getClient(context, config, type) {
 
     if (config && 'connection' in config) {
         clientConfig.endpoint = config.connection ? config.connection : 'default';
-        clientConfig.cached = config.connection_cache !== undefined ? config.connection_cache : true;
+        clientConfig.cached = config.connection_cache !== undefined
+            ? config.connection_cache : true;
     } else {
         clientConfig.endpoint = 'default';
         clientConfig.cached = true;

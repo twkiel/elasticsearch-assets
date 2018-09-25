@@ -23,21 +23,21 @@ function createClient(context, opConfig) {
         return new Promise((resolve, reject) => {
             const ref = setTimeout(() => reject('HTTP request timed out connecting to API endpoint.'), opConfig.timeout);
 
-            fetchData({ uri, json: true})
+            fetchData({ uri, json: true })
                 .then((results) => {
                     clearTimeout(ref);
-                    resolve(results)
+                    resolve(results);
                 })
-                .catch(err => {
+                .catch((err) => {
                     clearTimeout(ref);
-                    reject(err);
-                })
-        })
+                    return reject(err);
+                });
+        });
     }
 
     function apiSearch(queryConfig) {
         const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
-        const query = parseQueryConfig(mustQuery);
+        const searchQuery = parseQueryConfig(mustQuery);
 
         function parseQueryConfig(mustArray) {
             const queryOptions = {
@@ -47,7 +47,7 @@ function createClient(context, opConfig) {
             let geoQuery = _parseGeoQuery();
             if (geoQuery.length > 0) geoQuery = `&${geoQuery}`;
             let query = '';
-            
+
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
                     _.forOwn(queryAction, (config, key) => {
@@ -69,7 +69,7 @@ function createClient(context, opConfig) {
             let sort = '';
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
                 queryConfig.body.sort.forEach((sortType) => {
-                    // We are only checking for date sorts, geo sorts are already handled by _parseGeoQuery
+                    // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
                     if (sortType[opConfig.date_field_name]) {
                         // {"date":{"order":"asc"}}
                         sort = `&sort=${opConfig.date_field_name}:${queryConfig.body.sort[0][opConfig.date_field_name].order}`;
@@ -151,11 +151,11 @@ function createClient(context, opConfig) {
                 })
                 .catch((err) => {
                     logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
-                    return Promise.reject(err)
+                    return Promise.reject(err);
                 });
         }
 
-        return callTeraserver(query);
+        return callTeraserver(searchQuery);
     }
 
     return {

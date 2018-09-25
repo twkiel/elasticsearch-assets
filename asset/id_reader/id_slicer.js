@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const parseError = require('@terascope/error-parser');
 const { retryModule } = require('../utils');
-
+/* eslint-disable no-useless-escape no-restricted-syntax */
 const base64url = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
     'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
     'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '\-', '_'];
@@ -71,7 +71,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         function getKeySlice(query) {
             return getCountForKey(query)
                 .then((count) => {
-                    if (count >= opConfig.size) {
+                    if (count > opConfig.size) {
                         events.emit('slicer:slice:recursion');
                         return determineKeySlice(generator, false, rangeObj);
                     }
@@ -146,7 +146,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         const results = [];
         const len = num;
 
-        for (let i = 0; i < len; i++) {
+        for (let i = 0; i < len; i += 1) {
             let divideNum = Math.ceil(keysArray.length / len);
 
             if (i === num - 1) {
@@ -161,7 +161,9 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
 
     function keyGenerator(baseArray, keysArray, retryKey, dateRange) {
         // if there is a starting depth, use the key depth generator, if not use default generator
-        const gen = startingKeyDepth ? generateKeyDepth(baseArray, keysArray) : generateKeys(baseArray, keysArray);
+        const gen = startingKeyDepth
+            ? generateKeyDepth(baseArray, keysArray)
+            : generateKeys(baseArray, keysArray);
         let closePath = false;
 
         if (retryKey) {
@@ -186,7 +188,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
                 }
             }
         }
-        return function () {
+        return function slicer() {
             return determineKeySlice(gen, closePath, dateRange)
                 .then((results) => {
                     closePath = true;
@@ -221,11 +223,13 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         // slicer is being used as a subslicer, needs to ignore multiple slicer
         // configs and division of key array
         if (range) {
-            return Promise.resolve(retryData.map(retryData => keyGenerator(baseKeyArray, baseKeyArray, retryData.key, range)));
+            return Promise.resolve(
+                retryData.map(data => keyGenerator(baseKeyArray, baseKeyArray, data.key, range))
+            );
         }
 
         // real retry of executionContext here, need to reformat retry data
-        const formattedRetryData = retryData.map((obj) => {
+        const parsedRetry = retryData.map((obj) => {
             // regex to get str between # and *
             if (obj.lastSlice) {
                 return obj.lastSlice.key.match(/\#(.*)\*/)[1];
@@ -234,7 +238,9 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
             return '';
         });
 
-        return Promise.resolve(slicerKeySet.map((keySet, index) => keyGenerator(baseKeyArray, keySet, formattedRetryData[index], range)));
+        return Promise.resolve(
+            slicerKeySet.map((keys, i) => keyGenerator(baseKeyArray, keys, parsedRetry[i], range))
+        );
     }
 
     return Promise.resolve(slicerKeySet.map(keySet => keyGenerator(baseKeyArray, keySet)));

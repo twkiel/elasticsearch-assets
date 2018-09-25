@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const util = require('util');
 
 function newProcessor(context, opConfig) {
     function formattedDate(record) {
@@ -70,7 +69,7 @@ function newProcessor(context, opConfig) {
             };
 
             if (opConfig.preserve_id) meta._id = record._key;
-            if (fromElastic) meta._id = data.hits.hits[start]._id; 
+            if (fromElastic) meta._id = data.hits.hits[start]._id;
             if (opConfig.id_field) meta._id = record[opConfig.id_field];
 
             if (opConfig.update || opConfig.upsert) {
@@ -144,8 +143,8 @@ function newProcessor(context, opConfig) {
 function schema() {
     return {
         index: {
-            doc: 'Index to where the data will be sent to, if you wish the index to be based on a timeseries, ' +
-            'use the timeseries option instead',
+            doc: 'Index to where the data will be sent to, if you wish the index to be based on a timeseries, '
+              + 'use the timeseries option instead',
             default: '',
             format(val) {
                 if (typeof val !== 'string') {
@@ -158,15 +157,15 @@ function schema() {
             }
         },
         type: {
-            doc: 'Set the type of the data for elasticsearch. If incoming data is from elasticsearch' +
-            ' it will default to the type on the metadata if this field is not set. This field must be set' +
-            'for all other incoming data',
+            doc: 'Set the type of the data for elasticsearch. If incoming data is from elasticsearch'
+            + ' it will default to the type on the metadata if this field is not set. This field must be set'
+            + 'for all other incoming data',
             default: '',
             format: 'optional_String'
         },
         preserve_id: {
-            doc: 'If incoming data if from elasticsearch, set this to true if you wish to keep the previous id' +
-            ' else elasticsearch will generate one for you (upload performance is faster if you let it auto-generate)',
+            doc: 'If incoming data if from elasticsearch, set this to true if you wish to keep the previous id'
+            + ' else elasticsearch will generate one for you (upload performance is faster if you let it auto-generate)',
             default: false,
             format: Boolean
         },
@@ -176,8 +175,8 @@ function schema() {
             format: 'optional_String'
         },
         timeseries: {
-            doc: 'Set to either daily, monthly or yearly if you want the index to be based off it, must be ' +
-            'used in tandem with index_prefix and date_field',
+            doc: 'Set to either daily, monthly or yearly if you want the index to be based off it, must be '
+            + 'used in tandem with index_prefix and date_field',
             default: '',
             format(value) {
                 // This will generate logstash style timeseries names
@@ -187,8 +186,8 @@ function schema() {
             }
         },
         index_prefix: {
-            doc: 'Used with timeseries, adds a prefix to the date ie (index_prefix: "events-" ,timeseries: "daily => ' +
-            'events-2015.08.20',
+            doc: 'Used with timeseries, adds a prefix to the date ie (index_prefix: "events-" ,timeseries: "daily => '
+            + 'events-2015.08.20',
             default: '',
             format(val) {
                 if (val) {
@@ -228,8 +227,8 @@ function schema() {
             }
         },
         update_fields: {
-            doc: 'if you are updating the documents, you can specify fields to update here (it should be an array ' +
-            'containing all the field names you want updated), it defaults to sending the entire document',
+            doc: 'if you are updating the documents, you can specify fields to update here (it should be an array '
+            + 'containing all the field names you want updated), it defaults to sending the entire document',
             default: [],
             format: Array
         },
