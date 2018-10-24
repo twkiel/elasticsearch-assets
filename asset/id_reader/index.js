@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getClient, getOpConfig } = require('../utils');
+const { getClient, getOpConfig } = require('@terascope/job-components');
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, 'id_reader');

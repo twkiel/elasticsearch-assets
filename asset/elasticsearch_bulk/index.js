@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getClient, getOpConfig } = require('../utils');
+const { getClient, getOpConfig } = require('@terascope/job-components');
 
 function newProcessor(context, opConfig) {
     const {
