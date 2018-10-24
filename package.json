@@ -4,7 +4,7 @@
   "version": "1.0.1",
   "main": "index.js",
   "scripts": {
-    "build": "scripts/build.js",
+    "build": "scripts/build.sh",
     "lint": "eslint asset/**/*.js spec/**/*.js",
     "lint:fix": "eslint --fix asset/**/*.js spec/**/*.js",
     "test": "jest",
@@ -36,6 +36,7 @@
     "eslint-plugin-import": "^2.13.0",
     "fs-extra": "^7.0.0",
     "jest": "^23.6.0",
+    "mktemp": "^0.4.0",
     "path": "^0.12.7"
   }
 }
