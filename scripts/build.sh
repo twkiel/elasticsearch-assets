@@ -10,7 +10,7 @@ OUTDIR=${SRCDIR}/builds
 mkdir -p $OUTDIR
 
 # Generate the asset name
-ASSETNAME=$(node ${DIR}/assetName.js)
+ASSETNAME=$(node ${DIR}/asset-name.js)
 #echo "Output asset to be named: $ASSETNAME"
 
 # Create the tempdir
