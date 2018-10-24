@@ -20,7 +20,6 @@ function newReader(context, opConfig, executionConfig, client) {
                 }));
         }
         return elasticsearch.search(query);
-        // .then(records => DataEntity.makeArray(records));
     };
 }
 
