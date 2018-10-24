@@ -33,6 +33,13 @@ function newProcessor(context, opConfig) {
         return opConfig.index;
     }
 
+    function getMetadata(record, key) {
+        if (typeof record.getMetadata === 'function') {
+            return record.getMetadata(key);
+        }
+        return record[key];
+    }
+
     /*
      * Additional configuration fields. Should validate once a schema is available.
      * update - boolean. set to true if the ES request should be an update
@@ -68,7 +75,7 @@ function newProcessor(context, opConfig) {
                 _type: opConfig.type
             };
 
-            if (opConfig.preserve_id) meta._id = record._key;
+            if (opConfig.preserve_id) meta._id = getMetadata(record, '_key');
             if (fromElastic) meta._id = data.hits.hits[start]._id;
             if (opConfig.id_field) meta._id = record[opConfig.id_field];
 

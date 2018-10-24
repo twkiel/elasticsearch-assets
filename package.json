@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@terascope/elasticsearch-api": "^1.1.2",
+    "@terascope/job-components": "^0.6.2",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",

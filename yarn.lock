@@ -35,7 +35,7 @@
   dependencies:
     lodash "^4.17.11"
 
-"@terascope/job-components@^0.6.0":
+"@terascope/job-components@^0.6.0", "@terascope/job-components@^0.6.2":
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.6.2.tgz#ab770d55d72bff6f43d2ab96bdd8cf7fd7788489"
   integrity sha512-U1sibTSu05ZrOnq5d7gWWYY5IjxXgazinZSX23N8iLCxcTNLBRLMgPZGHvQcBu6ymhpKedFWIxebPQ/5iaVpUw==

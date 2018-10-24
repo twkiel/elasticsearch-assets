@@ -107,7 +107,7 @@ function schema() {
             format: Boolean
         },
         preserve_id: {
-            doc: 'Set to true to add the _id field of the doc set to _key on the documents returned',
+            doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',
             default: false,
             format: Boolean
         },

@@ -1,6 +1,7 @@
 'use strict';
 
 const elasticApi = require('@terascope/elasticsearch-api');
+const { DataEntity } = require('@terascope/job-components');
 
 function newReader(context, opConfig, executionConfig, client) {
     let formatData = false;
@@ -14,12 +15,12 @@ function newReader(context, opConfig, executionConfig, client) {
         if (formatData) {
             return elasticsearch.search(query)
                 .then(fullResponseObj => fullResponseObj.hits.hits.map((doc) => {
-                    const record = doc._source;
-                    record._key = doc._id;
-                    return record;
+                    const metadata = { _key: doc._id };
+                    return DataEntity.make(doc._source, metadata);
                 }));
         }
         return elasticsearch.search(query);
+        // .then(records => DataEntity.makeArray(records));
     };
 }
 
