@@ -30,8 +30,8 @@ yarn --prod --silent --no-progress
 # Zip up generated asset directory
 cd ..
 zip -q -r $OUTDIR/$ASSETNAME asset
-ls $(realpath $OUTDIR/$ASSETNAME)
-zipinfo $(realpath $OUTDIR/$ASSETNAME)
+ls $OUTDIR/$ASSETNAME
+zipinfo $OUTDIR/$ASSETNAME
 
 # Cleanup
 rm -rf $TMPDIR
