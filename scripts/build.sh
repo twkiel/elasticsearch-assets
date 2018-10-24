@@ -15,7 +15,7 @@ ASSETNAME=$(node ${DIR}/assetName.js)
 
 # Create the tempdir
 TMPDIR=`mktemp -d`
-echo $TMPDIR
+# echo $TMPDIR
 
 # Copy the source to the tmpdir
 cp -a ${SRCDIR} ${TMPDIR}
@@ -25,12 +25,13 @@ rm -rf ${TMPDIR}/asset/node_modules
 
 # Build and install asset dependencies
 cd ${TMPDIR}/asset
-yarn --prod
+yarn --prod --silent --no-progress
 
 # Zip up generated asset directory
 cd ..
-zip -r $OUTDIR/$ASSETNAME asset
+zip -q -r $OUTDIR/$ASSETNAME asset
 ls $(realpath $OUTDIR/$ASSETNAME)
+zipinfo $(realpath $OUTDIR/$ASSETNAME)
 
 # Cleanup
 rm -rf $TMPDIR
