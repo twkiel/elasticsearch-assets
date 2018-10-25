@@ -161,6 +161,10 @@ function schema() {
                 if (val.match(/[A-Z]/)) {
                     throw new Error('index must be lowercase');
                 }
+
+                if (val.length === 0) {
+                    throw new Error('index must not be an empty string');
+                }
             }
         },
         type: {
