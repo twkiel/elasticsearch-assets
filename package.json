@@ -8,13 +8,14 @@
     "lint": "eslint asset/**/*.js spec/**/*.js",
     "lint:fix": "eslint --fix asset/**/*.js spec/**/*.js",
     "test": "jest",
-    "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand"
+    "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
+    "postinstall" : "cd asset && yarn --prod --silent --no-progress"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jsnoble/elasticsearch-assets.git"
   },
-  "author": "",
+  "author": "Terascope, LLC <info@terascope.io>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jsnoble/elasticsearch-assets/issues"
