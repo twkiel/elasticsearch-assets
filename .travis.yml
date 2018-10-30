@@ -13,5 +13,3 @@ jobs:
         file_glob: true
         file: builds/*.zip
         skip_cleanup: true
-        on:
-          tags: true
