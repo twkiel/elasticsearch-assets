@@ -9,7 +9,7 @@
     "lint:fix": "eslint --fix asset/**/*.js spec/**/*.js",
     "test": "jest",
     "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
-    "postinstall" : "cd asset && yarn --prod --silent --no-progress"
+    "postinstall" : "yarn --cwd ./asset --prod --silent --no-progress"
   },
   "repository": {
     "type": "git",
