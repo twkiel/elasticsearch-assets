@@ -1,7 +1,7 @@
 {
   "name": "elasticsearch-assets",
   "description": "bundle of processors for teraslice",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "index.js",
   "scripts": {
     "build": "scripts/build.sh",
