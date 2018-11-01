@@ -136,7 +136,7 @@ describe('elasticsearch_reader', () => {
         expect(Array.isArray(results3)).toEqual(true);
         expect(results3.hits).toEqual(undefined);
         expect(typeof results3[0]).toEqual('object');
-        expect(results3[0]._key).toEqual('someId');
+        expect(results3[0].getMetadata('_key')).toEqual('someId');
     });
 
     it('newSlicer return a function', async () => {

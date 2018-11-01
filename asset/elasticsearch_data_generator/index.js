@@ -1,17 +1,16 @@
 'use strict';
 
+const path = require('path');
 const Promise = require('bluebird');
 const parseError = require('@terascope/error-parser');
-const mocker = require('mocker-data-generator').default;
-const { getOpConfig, existsSync } = require('../utils');
-const defaultSchema = require('./default_schema');
+const { getOpConfig, existsSync } = require('@terascope/job-components');
 
 function parsedSchema(opConfig) {
     let dataSchema = false;
 
     if (opConfig.json_schema) {
         const firstPath = opConfig.json_schema;
-        const nextPath = `${process.cwd()}/${opConfig.json_schema}`;
+        const nextPath = path.join(process.cwd(), opConfig.json_schema);
 
         try {
             if (existsSync(firstPath)) {
@@ -24,12 +23,14 @@ function parsedSchema(opConfig) {
             throw new Error(`Could not retrieve code for: ${opConfig}\n${e}`);
         }
     } else {
-        return defaultSchema(opConfig, dataSchema);
+        return require('./default_schema')(opConfig, dataSchema);
     }
 }
 
 function newReader(context, opConfig) {
+    const mocker = require('mocker-data-generator').default;
     const dataSchema = parsedSchema(opConfig);
+
     return function _newReader(msg) {
         if (opConfig.stress_test) {
             return mocker()

@@ -3,8 +3,8 @@
 const dateMath = require('datemath-parser');
 const moment = require('moment');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { dateOptions, getClient, getOpConfig } = require('../utils');
-
+const { getClient, getOpConfig } = require('@terascope/job-components');
+const { dateOptions } = require('../utils');
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, 'elasticsearch_reader');
@@ -107,7 +107,7 @@ function schema() {
             format: Boolean
         },
         preserve_id: {
-            doc: 'Set to true to add the _id field of the doc set to _key on the documents returned',
+            doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',
             default: false,
             format: Boolean
         },

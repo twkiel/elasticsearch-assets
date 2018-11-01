@@ -1,6 +1,7 @@
 'use strict';
 
 const harness = require('@terascope/teraslice-op-test-harness');
+const { DataEntity } = require('@terascope/job-components');
 const indexer = require('../asset/elasticsearch_index_selector');
 
 describe('elasticsearch index selector', () => {
@@ -134,6 +135,23 @@ describe('elasticsearch index selector', () => {
                 ]
             }
         };
+        const results = await opTest.processData(opConfig, data);
+
+        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'specialID' } });
+        expect(results[1]).toEqual({ some: 'data' });
+    });
+
+    it('preserve_id will work the DataEntity', async () => {
+        const opConfig = {
+            _op: 'elasticsearch_index_selector',
+            index: 'some_index',
+            type: 'events',
+            preserve_id: true,
+            delete: false
+        };
+        const data = [
+            DataEntity.make({ some: 'data' }, { _key: 'specialID' })
+        ];
         const results = await opTest.processData(opConfig, data);
 
         expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'specialID' } });
