@@ -10,15 +10,15 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@terascope/elasticsearch-api": "^1.1.1",
-    "@terascope/error-parser": "^1.0.0",
-    "@terascope/job-components": "^0.6.2",
-    "bluebird": "^3.5.1",
+    "@terascope/elasticsearch-api": "^1.1.2",
+    "@terascope/error-parser": "^1.0.1",
+    "@terascope/job-components": "^0.7.0",
+    "bluebird": "^3.5.2",
     "datemath-parser": "^1.0.6",
-    "lodash": "^4.17.10",
-    "mocker-data-generator": "^2.6.1",
+    "lodash": "^4.17.11",
+    "mocker-data-generator": "^2.6.6",
     "moment": "^2.22.2",
-    "request": "^2.87.0",
+    "request": "^2.88.0",
     "request-promise": "^4.2.2"
   }
 }

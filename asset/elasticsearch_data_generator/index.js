@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const Promise = require('bluebird');
 const parseError = require('@terascope/error-parser');
 const { getOpConfig, existsSync } = require('@terascope/job-components');
@@ -9,7 +10,7 @@ function parsedSchema(opConfig) {
 
     if (opConfig.json_schema) {
         const firstPath = opConfig.json_schema;
-        const nextPath = `${process.cwd()}/${opConfig.json_schema}`;
+        const nextPath = path.join(process.cwd(), opConfig.json_schema);
 
         try {
             if (existsSync(firstPath)) {
