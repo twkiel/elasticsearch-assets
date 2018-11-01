@@ -6,7 +6,10 @@ const _ = require('lodash');
 const dateMath = require('datemath-parser');
 const parseError = require('@terascope/error-parser');
 const {
-    dateOptions, retryModule, dateFormat: dateFormatMS, dateFormatSeconds: dateFormatS
+    dateOptions,
+    retryModule,
+    dateFormat: dateFormatMS,
+    dateFormatSeconds: dateFormatS
 } = require('../../utils');
 
 function newSlicer(context, opConfig, executionContext, retryData, logger, client) {

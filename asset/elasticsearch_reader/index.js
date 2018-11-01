@@ -1,9 +1,9 @@
 'use strict';
 
-const dateMath = require('datemath-parser');
 const moment = require('moment');
+const dateMath = require('datemath-parser');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getClient, getOpConfig } = require('@terascope/job-components');
+const { getOpConfig, getClient } = require('@terascope/job-components');
 const { dateOptions } = require('../utils');
 
 function newSlicer(context, executionContext, retryData, logger) {

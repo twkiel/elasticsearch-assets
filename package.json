@@ -21,8 +21,7 @@
     "url": "https://github.com/jsnoble/elasticsearch-assets/issues"
   },
   "homepage": "https://github.com/jsnoble/elasticsearch-assets#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@terascope/teraslice-op-test-harness": "^1.2.0",
     "eslint": "^5.8.0",

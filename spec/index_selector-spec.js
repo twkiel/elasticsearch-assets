@@ -1,7 +1,7 @@
 'use strict';
 
 const harness = require('@terascope/teraslice-op-test-harness');
-const { DataEntity } = require('@terascope/job-components');
+const { DataEntity } = require('../asset/node_modules/@terascope/job-components');
 const indexer = require('../asset/elasticsearch_index_selector');
 
 describe('elasticsearch index selector', () => {
