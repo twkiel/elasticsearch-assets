@@ -304,7 +304,7 @@ describe('elasticsearch_reader', () => {
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
-        expect(results).toEqual(null);
+        expect(results).toEqual([null]);
     });
 
     it('slicer can produce date slices', async () => {
@@ -336,7 +336,7 @@ describe('elasticsearch_reader', () => {
         expect(results.count).toEqual(100);
 
         const results2 = await test.run();
-        expect(results2).toEqual(null);
+        expect(results2).toEqual([null]);
     });
 
     it('slicer can reduce date slices down to size', async () => {
@@ -390,7 +390,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(50);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:recursion', hasRecursedEvent);
     });
@@ -443,7 +443,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
@@ -498,7 +498,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
@@ -564,7 +564,7 @@ describe('elasticsearch_reader', () => {
         expect(results4.end).toEqual(closingDate.format());
 
         const results5 = await test.run();
-        expect(results5).toEqual(null);
+        expect(results5).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });

@@ -117,7 +117,7 @@ describe('id_reader', () => {
         expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
 
         const slice3 = await test.run();
-        expect(slice3).toEqual(null);
+        expect(slice3).toEqual([null]);
     });
 
     it('it produces values starting at a specific depth', async () => {
@@ -178,7 +178,7 @@ describe('id_reader', () => {
         expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
 
         const slice3 = await test.run();
-        expect(slice3).toEqual(null);
+        expect(slice3).toEqual([null]);
     });
 
     it('key range gets divided up by number of slicers', async () => {
@@ -202,7 +202,7 @@ describe('id_reader', () => {
 
         const slices2 = await test.run();
 
-        expect(slices2).toEqual(null);
+        expect(slices2).toEqual([null, null]);
     });
 
     it('key range gets divided up by number of slicers', async () => {
@@ -242,7 +242,7 @@ describe('id_reader', () => {
         expect(slice4).toEqual({ count: 100, key: 'events-#b2*' });
 
         const slice5 = await test.run();
-        expect(slice5).toEqual(null);
+        expect(slice5).toEqual([null]);
     });
 
     it('can return to previous position', async () => {

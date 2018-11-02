@@ -55,15 +55,15 @@ describe('elasticsearch_data_generator', () => {
 
         const [s1Results2, s2Results2] = await Promise.all([test.run(), test2.run()]);
         expect(s1Results2).toEqual([5]);
-        expect(s2Results2).toEqual(null);
+        expect(s2Results2).toEqual([null]);
 
         const [s1Results3, s2Results3] = await Promise.all([test.run(), test2.run()]);
         expect(s1Results3).toEqual([5]);
-        expect(s2Results3).toEqual(null);
+        expect(s2Results3).toEqual([null]);
 
         const [s1Results4, s2Results4] = await Promise.all([test.run(), test2.run()]);
-        expect(s1Results4).toEqual(null);
-        expect(s2Results4).toEqual(null);
+        expect(s1Results4).toEqual([null]);
+        expect(s2Results4).toEqual([null]);
     });
 
     it('slicer in "persistent" mode will continuously produce the same number', async () => {
