@@ -83,7 +83,7 @@ Example configuration if lifecycle is set to "persistent"
 ```
 {
     "_op": "elasticsearch_reader",
-    "index": "someIndex",
+    "index": "some-index",
     "size": 5000,
     "interval": "5s",
     "delay": "1m",
@@ -281,4 +281,3 @@ The keys used were hexidecimal based
 | multisend | When set to true the connection_map will be used allocate the data stream across multiple connections based on the keys of the incoming documents | Boolean | optional, defaults to false |
 | multisend_index_append | When set to true will append the connection_map prefixes to the name of the index before data is submitted | Boolean | optional, defaults to false |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
-

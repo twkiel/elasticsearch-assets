@@ -4,7 +4,6 @@ const harness = require('@terascope/teraslice-op-test-harness');
 const esSender = require('../asset/elasticsearch_bulk');
 const MockClient = require('./mock_client');
 
-
 describe('elasticsearch_bulk', () => {
     const opTest = harness(esSender);
     let client;
@@ -30,8 +29,8 @@ describe('elasticsearch_bulk', () => {
 
     it('returns a function', async () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 100, multisend: false };
-        const test = await opTest.init(opConfig);
-        expect(typeof test.operation).toEqual('function');
+        const test = await opTest.init({ opConfig });
+        expect(typeof test.operation).toEqual('object');
     });
 
     it('if no docs, returns a promise of passed in data', async () => {
