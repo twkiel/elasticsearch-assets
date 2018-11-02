@@ -18,10 +18,10 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@terascope/job-components@^0.6.0":
-  version "0.6.5"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.6.5.tgz#e7d15b79a3b5f3f4183bb4b5e3e6db9c2ddc3b9e"
-  integrity sha512-DpB56onpSJI0Rp2QNYA5BcRMwcS6IyJ048PTRddsKAbMpTZ2AZyRkCaRBmmsATbNtxxq5aqyQZvH9z8iboI42g==
+"@terascope/job-components@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.8.1.tgz#53eb3776e28ac47a3c259bc773074650a67715d9"
+  integrity sha512-TDn2SF0Kre+HtkXbaZhqbtnbX+//6bq3fyuHiED4FfcJaquGyRKj2t2oq2x8xuUb41lPwTHX2uDlHWqOdm47eQ==
   dependencies:
     "@terascope/queue" "^1.1.4"
     convict "^4.4.0"
@@ -35,12 +35,12 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.4.tgz#52db805f09403579478ede0e041f76c176c6e766"
   integrity sha512-ZH8/q1vx8CPYhfamzCRErj1HUvdN8rQbV3uvyAQ7PLKh2+CrN5HX6J8lCa1TVDlb1RTXkCGzOXnJ2b+AJP3lRg==
 
-"@terascope/teraslice-op-test-harness@~1.2.0":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.2.2.tgz#7c353eb503909994e67d5be7b8c2e60695634905"
-  integrity sha512-8537fMLlZ4kzhqEJ3ZwQ+X2kdyaY7jmr6M59yF+u/9gMH0KjaM7Vl/WxB/NFZg9fQBK2P+Xzs2JWu/Q2+LGk+w==
+"@terascope/teraslice-op-test-harness@~1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.3.1.tgz#daa6679ea67cc9c77b75ab5ddbdb46aa14eaf3a2"
+  integrity sha512-QmGU4Ztdik9BPkBU8k8kLDzxMM8+vP2CnU7RiEnpwlaY2OdiSyfheF4JwB2RLvQdtZDf26WIb3AS3wAQR2+ByQ==
   dependencies:
-    "@terascope/job-components" "^0.6.0"
+    "@terascope/job-components" "^0.8.1"
     bluebird "^3.5.2"
     lodash "^4.17.11"
 
