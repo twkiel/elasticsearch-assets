@@ -7,7 +7,6 @@ const harness = require('@terascope/teraslice-op-test-harness');
 const elasticDateReader = require('../asset/elasticsearch_reader');
 const MockClient = require('./mock_client');
 
-
 describe('elasticsearch_reader', () => {
     const opTest = harness(elasticDateReader);
     let client;
@@ -73,7 +72,7 @@ describe('elasticsearch_reader', () => {
                 _op: 'elasticsearch_reader',
                 date_field_name: '@timestamp',
                 size: 50,
-                index: 'someIndex',
+                index: 'someindex',
                 full_response: true
             }]
         };
@@ -81,62 +80,30 @@ describe('elasticsearch_reader', () => {
         const type = 'reader';
 
         const reader = await opTest.init({ executionConfig, type });
-        expect(typeof reader.operation).toEqual('function');
+        expect(typeof reader.operation).toEqual('object');
     });
 
     it('newReader can return formated data', async () => {
         const firstDate = moment();
         const laterDate = moment(firstDate).add(5, 'm');
 
-        const opConfig1 = {
+        const opConfig = {
             _op: 'elasticsearch_reader',
             date_field_name: '@timestamp',
             size: 50,
             index: 'someindex'
         };
-        const opConfig2 = {
-            _op: 'elasticsearch_reader',
-            date_field_name: '@timestamp',
-            size: 50,
-            index: 'someindex',
-            full_response: true
-        };
-        const opConfig3 = {
-            _op: 'elasticsearch_reader',
-            date_field_name: '@timestamp',
-            size: 50,
-            index: 'someindex',
-            preserve_id: true
-        };
+
         const type = 'reader';
 
-        const [reader1, reader2, reader3] = await Promise.all([
-            opTest.init({ opConfig: opConfig1, type }),
-            opTest.init({ opConfig: opConfig2, type }),
-            opTest.init({ opConfig: opConfig3, type })
-        ]);
+        const reader = await opTest.init({ opConfig, type });
 
         const msg = { count: 100, start: firstDate.format(), end: laterDate.format() };
 
-        const [results1, results2, results3] = await Promise.all([
-            reader1.run(msg),
-            reader2.run(msg),
-            reader3.run(msg)
-        ]);
+        const results = await reader.run(msg);
 
-        expect(Array.isArray(results1)).toEqual(true);
-        expect(results1.hits).toEqual(undefined);
-        expect(typeof results1[0]).toEqual('object');
-
-        expect(results2.hits).toBeDefined();
-        expect(results2.hits.hits).toBeDefined();
-        expect(Array.isArray(results2.hits.hits)).toEqual(true);
-        expect(results2.hits.hits[0]._id).toEqual('someId');
-
-        expect(Array.isArray(results3)).toEqual(true);
-        expect(results3.hits).toEqual(undefined);
-        expect(typeof results3[0]).toEqual('object');
-        expect(results3[0].getMetadata('_key')).toEqual('someId');
+        expect(Array.isArray(results)).toEqual(true);
+        expect(typeof results[0]).toEqual('object');
     });
 
     it('newSlicer return a function', async () => {
@@ -145,10 +112,10 @@ describe('elasticsearch_reader', () => {
             time_resolution: 's',
             date_field_name: '@timestamp',
             size: 50,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '12hrs',
-            start: new Date(),
-            end: new Date()
+            start: new Date().getTime(),
+            end: new Date().getTime()
         };
         const executionConfig = {
             lifecycle: 'once',
@@ -157,14 +124,12 @@ describe('elasticsearch_reader', () => {
         };
 
         const singleSlicer = await opTest.init({ executionConfig });
-        expect(typeof singleSlicer.operation[0]).toEqual('function');
-        expect(singleSlicer.operation.length).toEqual(1);
+        expect(singleSlicer.operation.slicers()).toEqual(1);
 
         executionConfig.slicers = 3;
 
         const multiSlicer = await opTest.init({ executionConfig, client });
-        multiSlicer.operation.forEach(slicer => expect(typeof slicer).toEqual('function'));
-        expect(multiSlicer.operation.length).toEqual(3);
+        expect(multiSlicer.operation.slicers()).toEqual(3);
     });
 
     it('slicers will throw if date_field_name does not exist on docs in the index', async () => {
@@ -173,7 +138,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: 'date',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
             start: '2015-08-25T00:00:00',
             end: '2015-08-25T00:02:00'
@@ -224,7 +189,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs'
         };
 
@@ -233,7 +198,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
             start: firstDate.format()
         };
@@ -243,7 +208,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
             end: moment(laterDate).add(1, 's').format()
         };
@@ -253,7 +218,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
             start: firstDate.format(),
             end: moment(laterDate).add(1, 's').format()
@@ -294,7 +259,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
             query: 'some:luceneQueryWithNoResults'
         };
@@ -306,7 +271,7 @@ describe('elasticsearch_reader', () => {
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
-        expect(results).toEqual(null);
+        expect(results).toEqual([null]);
     });
 
     it('slicer can produce date slices', async () => {
@@ -318,7 +283,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs'
         };
 
@@ -331,14 +296,14 @@ describe('elasticsearch_reader', () => {
             { '@timestamp': laterDate },
         ]);
         const test = await opTest.init({ executionConfig });
-        const results = await test.run();
+        const [results] = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
         expect(results.end).toEqual(closingDate.format());
         expect(results.count).toEqual(100);
 
         const results2 = await test.run();
-        expect(results2).toEqual(null);
+        expect(results2).toEqual([null]);
     });
 
     it('slicer can reduce date slices down to size', async () => {
@@ -351,7 +316,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 50,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '2hrs',
         };
 
@@ -378,13 +343,13 @@ describe('elasticsearch_reader', () => {
         opTest.events.on('slicer:slice:recursion', hasRecursedEvent);
 
         const test = await opTest.init({ executionConfig });
-        const results = await test.run();
+        const [results] = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
         expect(results.end).toEqual(middleDate.format());
         expect(results.count).toEqual(50);
 
-        const results2 = await test.run();
+        const [results2] = await test.run();
 
         expect(hasRecursed).toEqual(true);
         expect(results2.start).toEqual(middleDate.format());
@@ -392,8 +357,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(50);
 
         const results3 = await test.run();
-
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:recursion', hasRecursedEvent);
     });
@@ -407,7 +371,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '5m',
         };
 
@@ -432,13 +396,13 @@ describe('elasticsearch_reader', () => {
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
 
         const test = await opTest.init({ executionConfig });
-        const results = await test.run();
+        const [results] = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
         expect(results.end).toEqual(endDate.format());
         expect(results.count).toEqual(100);
 
-        const results2 = await test.run();
+        const [results2] = await test.run();
 
         expect(hasExpanded).toEqual(true);
         expect(results2.start).toEqual(endDate.format());
@@ -446,7 +410,7 @@ describe('elasticsearch_reader', () => {
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
@@ -462,7 +426,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '5m',
         };
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
@@ -488,20 +452,20 @@ describe('elasticsearch_reader', () => {
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
 
         const test = await opTest.init({ executionConfig });
-        const results = await test.run();
+        const [results] = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
         expect(moment(results.end).isBetween(middleDate, endDate)).toEqual(true);
         expect(results.count).toEqual(100);
 
-        const results2 = await test.run();
+        const [results2] = await test.run();
         expect(hasExpanded).toEqual(true);
         expect(moment(results2.start).isBetween(middleDate, endDate)).toEqual(true);
         expect(results2.end).toEqual(closingDate.format());
         expect(results2.count).toEqual(100);
 
         const results3 = await test.run();
-        expect(results3).toEqual(null);
+        expect(results3).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
@@ -517,7 +481,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 100,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '3m',
         };
         const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
@@ -547,28 +511,27 @@ describe('elasticsearch_reader', () => {
         opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
 
         const test = await opTest.init({ executionConfig });
-        const results = await test.run();
+        const [results] = await test.run();
 
         expect(results.start).toEqual(firstDate.format());
         expect(moment(results.end).isBetween(firstDate, midDate)).toEqual(true);
         expect(results.count).toEqual(100);
 
-        const results2 = await test.run();
+        const [results2] = await test.run();
 
         expect(moment(results2.end).isBetween(midDate, endDate)).toEqual(true);
         expect(hasExpanded).toEqual(true);
         expect(results2.count).toEqual(100);
 
-        const results3 = await test.run();
+        const [results3] = await test.run();
 
         expect(moment(results3.end).isBetween(midDate, endDate)).toEqual(true);
 
-        const results4 = await test.run();
+        const [results4] = await test.run();
         expect(results4.end).toEqual(closingDate.format());
 
         const results5 = await test.run();
-
-        expect(results5).toEqual(null);
+        expect(results5).toEqual([null]);
 
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
@@ -585,7 +548,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 10,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '5m',
         };
 
@@ -594,7 +557,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 'ms',
             size: 10,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '5m',
         };
 
@@ -620,7 +583,7 @@ describe('elasticsearch_reader', () => {
         const slicerS = await opTest.init({ executionConfig: executionConfig1, clients: [{ type: 'elasticsearch', client: client1 }] });
         const slicerMS = await opTest.init({ executionConfig: executionConfig2, clients: [{ type: 'elasticsearch', client: client2 }] });
 
-        const [resultsS, resultsMS] = await Promise.all([slicerS.run(), slicerMS.run()]);
+        const [[resultsS], [resultsMS]] = await Promise.all([slicerS.run(), slicerMS.run()]);
 
         const startMsIsSame = moment(resultsMS.start).isSame(moment(firstDateMS));
         const endMsIsSame = moment(resultsMS.end).isSame(moment(closingDateMS));
@@ -643,7 +606,7 @@ describe('elasticsearch_reader', () => {
             date_field_name: '@timestamp',
             time_resolution: 's',
             size: 10,
-            index: 'someIndex',
+            index: 'someindex',
             interval: '5m',
             subslice_by_key: true,
             subslice_key_threshold: 50,
@@ -672,11 +635,11 @@ describe('elasticsearch_reader', () => {
         const test = await opTest.init({ executionConfig });
         const results = await test.run();
 
-        hexadecimal.forEach((char, index) => {
-            const subslice = results[index];
+        hexadecimal.forEach((char) => {
+            const subslice = results.find(s => s.key === `test#${char}*`);
+            expect(subslice).not.toBeUndefined();
             expect(subslice.start.format() === firstDate.format()).toEqual(true);
             expect(subslice.end.format() === closingDate.format()).toEqual(true);
-            expect(subslice.key).toEqual(`test#${char}*`);
         });
     });
 });

@@ -1,9 +1,9 @@
 'use strict';
 
-const dateMath = require('datemath-parser');
 const moment = require('moment');
+const dateMath = require('datemath-parser');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getClient, getOpConfig } = require('@terascope/job-components');
+const { getOpConfig, getClient } = require('@terascope/job-components');
 const { dateOptions } = require('../utils');
 
 function newSlicer(context, executionContext, retryData, logger) {
@@ -100,11 +100,6 @@ function schema() {
                 if (!interval) throw new Error('date interval is not formatted correctly');
                 dateOptions(interval[2]);
             }
-        },
-        full_response: {
-            doc: 'DEPRECIATED : Set to true to receive the full Elasticsearch query response including index metadata.',
-            default: false,
-            format: Boolean
         },
         preserve_id: {
             doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',

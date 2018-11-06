@@ -19,10 +19,10 @@
   dependencies:
     lodash "^4.17.11"
 
-"@terascope/job-components@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.7.0.tgz#149dcccfcb86c7e6437e8d297e92120af4441c0a"
-  integrity sha512-0LjvqV1boEfMg3GPXpCTLf7RZi4L4ugz2J8NIZoVVcplpmt87U9ZtTnaPrvgS4vU5HsrP8U+Qcc4SjGlTYwQPA==
+"@terascope/job-components@^0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.8.2.tgz#ac095e0360f497fc240d11c5954687d95709ff55"
+  integrity sha512-j/gUtQ+G9Td1o1Uk5WgVK7vYmk03ki+2GuyrY4kiELu+n70o2ZB1J1iAosfbbii2p4nmqftjdjOO2YEsqSDYbg==
   dependencies:
     "@terascope/queue" "^1.1.4"
     convict "^4.4.0"

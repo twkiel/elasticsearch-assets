@@ -197,7 +197,8 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
                 .catch((err) => {
                     const errMessage = parseError(err);
                     logger.error('id_slicer errored while making slice', errMessage);
-                    return Promise.reject(errMessage);
+                    const error = new Error(`Failure to make slice: ${_.toString(err)}`);
+                    return Promise.reject(error);
                 });
         };
     }
@@ -214,7 +215,8 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
 
 
     if (_.difference(keyRange, baseKeyArray).length > 0) {
-        return Promise.reject(`key_range specified for id_reader contains keys not found in: ${opConfig.key_type}`);
+        const error = new Error(`key_range specified for id_reader contains keys not found in: ${opConfig.key_type}`);
+        return Promise.reject(error);
     }
 
     const slicerKeySet = divideKeyArray(keyArray, executionConfig.slicers);

@@ -68,23 +68,32 @@ describe('id_reader', () => {
     it('can create multiple slicers', async () => {
         const executionConfig1 = {
             slicers: 1,
-            operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
+            operations: [{
+                _op: 'id_reader',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                type: 'events-',
+                index: 'someindex'
+            }]
         };
         const executionConfig2 = {
             slicers: 2,
-            operations: [{ _op: 'id_reader', key_type: 'hexadecimal', key_range: ['a', 'b'] }]
+            operations: [{
+                _op: 'id_reader',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                type: 'events-',
+                index: 'someindex'
+            }]
         };
 
         const singleSlicer = await opTest.init({ executionConfig: executionConfig1 });
 
-        expect(singleSlicer.operation.length).toEqual(1);
-        expect(typeof singleSlicer.operation[0]).toEqual('function');
+        expect(singleSlicer.operation.slicers()).toEqual(1);
 
         const multiSlicers = await opTest.init({ executionConfig: executionConfig2 });
 
-        expect(multiSlicers.operation.length).toEqual(2);
-        expect(typeof multiSlicers.operation[0]).toEqual('function');
-        expect(typeof multiSlicers.operation[1]).toEqual('function');
+        expect(multiSlicers.operation.slicers()).toEqual(2);
     });
 
     it('it produces values', async () => {
@@ -95,19 +104,20 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
+                index: 'someindex',
                 size: 200
             }]
         };
         const test = await opTest.init({ executionConfig });
 
-        const slice1 = await test.run();
+        const [slice1] = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
 
-        const slice2 = await test.run();
+        const [slice2] = await test.run();
         expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
 
         const slice3 = await test.run();
-        expect(slice3).toEqual(null);
+        expect(slice3).toEqual([null]);
     });
 
     it('it produces values starting at a specific depth', async () => {
@@ -119,18 +129,19 @@ describe('id_reader', () => {
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b', 'c', 'd'],
                 starting_key_depth: 3,
+                index: 'someindex',
                 size: 200
             }]
         };
         const test = await opTest.init({ executionConfig });
 
-        const slice1 = await test.run();
+        const [slice1] = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a00*' });
 
-        const slice2 = await test.run();
+        const [slice2] = await test.run();
         expect(slice2).toEqual({ count: 100, key: 'events-#a01*' });
 
-        const slice3 = await test.run();
+        const [slice3] = await test.run();
         expect(slice3).toEqual({ count: 100, key: 'events-#a02*' });
     });
 
@@ -142,6 +153,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -159,14 +171,14 @@ describe('id_reader', () => {
 
         const test = await opTest.init({ executionConfig });
 
-        const slice1 = await test.run();
+        const [slice1] = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
 
-        const slice2 = await test.run();
+        const [slice2] = await test.run();
         expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
 
         const slice3 = await test.run();
-        expect(slice3).toEqual(null);
+        expect(slice3).toEqual([null]);
     });
 
     it('key range gets divided up by number of slicers', async () => {
@@ -177,6 +189,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -188,8 +201,8 @@ describe('id_reader', () => {
         expect(slices1[1]).toEqual({ count: 100, key: 'events-#b*' });
 
         const slices2 = await test.run();
-        expect(slices2[0]).toEqual(null);
-        expect(slices2[1]).toEqual(null);
+
+        expect(slices2).toEqual([null, null]);
     });
 
     it('key range gets divided up by number of slicers', async () => {
@@ -208,6 +221,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -215,20 +229,20 @@ describe('id_reader', () => {
         client.sequence = newSequence;
         const test = await opTest.init({ executionConfig });
 
-        const slice1 = await test.run();
+        const [slice1] = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
 
-        const slice2 = await test.run();
+        const [slice2] = await test.run();
         expect(slice2).toEqual({ count: 200, key: 'events-#b0*' });
 
-        const slice3 = await test.run();
+        const [slice3] = await test.run();
         expect(slice3).toEqual({ count: 200, key: 'events-#b1*' });
 
-        const slice4 = await test.run();
+        const [slice4] = await test.run();
         expect(slice4).toEqual({ count: 100, key: 'events-#b2*' });
 
         const slice5 = await test.run();
-        expect(slice5).toEqual(null);
+        expect(slice5).toEqual([null]);
     });
 
     it('can return to previous position', async () => {
@@ -240,24 +254,25 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
+                index: 'someindex',
                 size: 200
             }]
         };
         const test = await opTest.init({ executionConfig, retryData });
 
-        const slice1 = await test.run();
+        const [slice1] = await test.run();
         expect(slice1).toEqual({ count: 100, key: 'events-#a7*' });
 
-        const slice2 = await test.run();
+        const [slice2] = await test.run();
         expect(slice2).toEqual({ count: 100, key: 'events-#a8*' });
 
-        const slice3 = await test.run();
+        const [slice3] = await test.run();
         expect(slice3).toEqual({ count: 100, key: 'events-#a9*' });
 
-        const slice4 = await test.run();
+        const [slice4] = await test.run();
         expect(slice4).toEqual({ count: 100, key: 'events-#aa*' });
 
-        const slice5 = await test.run();
+        const [slice5] = await test.run();
         expect(slice5).toEqual({ count: 100, key: 'events-#ab*' });
     });
 });

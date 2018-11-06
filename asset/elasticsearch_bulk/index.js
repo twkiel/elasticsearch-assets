@@ -1,9 +1,9 @@
 'use strict';
 
-const Promise = require('bluebird');
 const _ = require('lodash');
+const Promise = require('bluebird');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getClient, getOpConfig } = require('@terascope/job-components');
+const { getOpConfig, getClient } = require('@terascope/job-components');
 
 function newProcessor(context, opConfig) {
     const {
@@ -91,6 +91,7 @@ function newProcessor(context, opConfig) {
         if (meta.create) return meta.create;
         if (meta.update) return meta.update;
         if (meta.delete) return meta.delete;
+
         throw new Error('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
     }
 

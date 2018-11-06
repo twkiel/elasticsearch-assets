@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const { DataEntity } = require('@terascope/job-components');
 
 function newProcessor(context, opConfig) {
     function formattedDate(record) {
@@ -33,13 +34,6 @@ function newProcessor(context, opConfig) {
         return opConfig.index;
     }
 
-    function getMetadata(record, key) {
-        if (typeof record.getMetadata === 'function') {
-            return record.getMetadata(key);
-        }
-        return record[key];
-    }
-
     /*
      * Additional configuration fields. Should validate once a schema is available.
      * update - boolean. set to true if the ES request should be an update
@@ -51,23 +45,10 @@ function newProcessor(context, opConfig) {
      */
 
     return (data) => {
-        let fromElastic = false;
-        let dataArray = data;
-        const fullResponseData = _.get(dataArray, 'hits.hits');
-
-        if (fullResponseData) {
-            fromElastic = true;
-            dataArray = fullResponseData;
-        }
         const formatted = [];
 
         function generateRequest(start) {
-            let record;
-            if (fromElastic) {
-                record = dataArray[start]._source;
-            } else {
-                record = dataArray[start];
-            }
+            const record = data[start];
             const indexSpec = {};
 
             const meta = {
@@ -75,8 +56,7 @@ function newProcessor(context, opConfig) {
                 _type: opConfig.type
             };
 
-            if (opConfig.preserve_id) meta._id = getMetadata(record, '_key');
-            if (fromElastic) meta._id = data.hits.hits[start]._id;
+            if (opConfig.preserve_id) meta._id = DataEntity.getMetadata(record, '_key');
             if (opConfig.id_field) meta._id = record[opConfig.id_field];
 
             if (opConfig.update || opConfig.upsert) {
@@ -138,7 +118,7 @@ function newProcessor(context, opConfig) {
             }
         }
 
-        for (let i = 0; i < dataArray.length; i += 1) {
+        for (let i = 0; i < data.length; i += 1) {
             generateRequest(i);
         }
 

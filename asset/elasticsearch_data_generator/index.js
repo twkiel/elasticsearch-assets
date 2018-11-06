@@ -1,9 +1,10 @@
 'use strict';
 
+const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
-const parseError = require('@terascope/error-parser');
-const { getOpConfig, existsSync } = require('@terascope/job-components');
+const { existsSync } = require('fs');
+const { getOpConfig } = require('@terascope/job-components');
 
 function parsedSchema(opConfig) {
     let dataSchema = false;
@@ -44,14 +45,14 @@ function newReader(context, opConfig) {
                     }
                     return results;
                 })
-                .catch(err => Promise.reject(`could not generate data error: ${parseError(err)}`));
+                .catch(err => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
         }
 
         return mocker()
             .schema('schema', dataSchema, msg)
             .build()
             .then(dataObj => dataObj.schema)
-            .catch(err => Promise.reject(`could not generate data error: ${parseError(err)}`));
+            .catch(err => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
     };
 }
 
@@ -162,7 +163,7 @@ function crossValidation(job) {
     const opConfig = getOpConfig(job, 'elasticsearch_data_generator');
 
     if (opConfig.set_id) {
-        const indexSelectorConfig = job.operations.find(op => op._op === 'elasticsearch_index_selector');
+        const indexSelectorConfig = getOpConfig(job, 'elasticsearch_index_selector');
 
         if (!indexSelectorConfig.id_field) {
             throw new Error('elasticsearch_data_generator is mis-configured, set_id must be used in tandem with id_field which is set in elasticsearch_index_selector');

@@ -1,7 +1,7 @@
 'use strict';
 
 const harness = require('@terascope/teraslice-op-test-harness');
-const { DataEntity } = require('@terascope/job-components');
+const { DataEntity } = require('../asset/node_modules/@terascope/job-components');
 const indexer = require('../asset/elasticsearch_index_selector');
 
 describe('elasticsearch index selector', () => {
@@ -90,55 +90,6 @@ describe('elasticsearch index selector', () => {
 
         expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events' } });
         expect(results[1]).toEqual(opTest.data.arrayLike[0]);
-    });
-
-    it('full_response still works', () => {
-        const context = {};
-        const opConfig = {
-            index: 'someIndex',
-            type: 'events',
-            full_response: true,
-            delete: false
-        };
-        const jobConfig = { logger: 'im a fake logger' };
-        const data = {
-            hits: {
-                hits: [
-                    { _id: 'specialID', _source: { some: 'data' } }
-                ]
-            }
-        };
-
-        const fn = indexer.newProcessor(context, opConfig, jobConfig);
-        const results = fn(data);
-        expect(results[0]).toEqual({ index: { _index: 'someIndex', _type: 'events', _id: 'specialID' } });
-    });
-
-
-    it('preserve_id will keep the previous id from elasticsearch data', async () => {
-        const opConfig = {
-            _op: 'elasticsearch_index_selector',
-            index: 'some_index',
-            type: 'events',
-            preserve_id: true,
-            delete: false
-        };
-        const data = {
-            hits: {
-                hits: [
-                    {
-                        type: 'someType',
-                        _index: 'some_index',
-                        _id: 'specialID',
-                        _source: { some: 'data' }
-                    }
-                ]
-            }
-        };
-        const results = await opTest.processData(opConfig, data);
-
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'specialID' } });
-        expect(results[1]).toEqual({ some: 'data' });
     });
 
     it('preserve_id will work the DataEntity', async () => {

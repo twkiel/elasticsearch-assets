@@ -6,7 +6,10 @@ const _ = require('lodash');
 const dateMath = require('datemath-parser');
 const parseError = require('@terascope/error-parser');
 const {
-    dateOptions, retryModule, dateFormat: dateFormatMS, dateFormatSeconds: dateFormatS
+    dateOptions,
+    retryModule,
+    dateFormat: dateFormatMS,
+    dateFormatSeconds: dateFormatS
 } = require('../../utils');
 
 function newSlicer(context, opConfig, executionContext, retryData, logger, client) {
@@ -102,13 +105,13 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
         // using this query to catch potential errors even if a date is given already
         return elasticsearch.search(query)
             .then((results) => {
-                const data = _.get(results, 'hits.hits[0]._source', results[0]);
-                if (data === undefined) {
+                const data = results[0];
+                if (data == null) {
                     logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${opConfig.index}`);
                     return null;
                 }
 
-                if (data[opConfig.date_field_name] === undefined) {
+                if (data[opConfig.date_field_name] == null) {
                     throw new Error(`date_field_name: "${opConfig.date_field_name}" for index: ${opConfig.index} does not exist, data: ${JSON.stringify(data)}, results: ${JSON.stringify(results)}`);
                 }
 
@@ -237,7 +240,8 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
             .catch((err) => {
                 const errMessage = parseError(err);
                 logger.error('error with determine slice:', errMessage);
-                return Promise.reject(errMessage);
+                const error = new Error(`Failure to determine slice: ${_.toString(err)}`);
+                return Promise.reject(error);
             });
     }
 
@@ -319,7 +323,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                             .catch((err) => {
                                 const errMsg = parseError(err);
                                 logger.error('error while subslicing by key', errMsg);
-                                return Promise.reject(errMsg);
+                                return Promise.reject(err);
                             });
                     }
 
@@ -438,7 +442,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                             .catch((err) => {
                                 const errMsg = parseError(err);
                                 logger.error('error while subslicing by key', errMsg);
-                                return Promise.reject(errMsg);
+                                return Promise.reject(err);
                             });
                     }
 
