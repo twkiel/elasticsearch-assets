@@ -83,7 +83,7 @@ Example configuration if lifecycle is set to "persistent"
 ```
 {
     "_op": "elasticsearch_reader",
-    "index": "some-index",
+    "index": "someindex",
     "size": 5000,
     "interval": "5s",
     "delay": "1m",

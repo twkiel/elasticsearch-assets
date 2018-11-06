@@ -21,7 +21,7 @@ function createClient(context, opConfig) {
 
     function makeRequest(uri) {
         return new Promise((resolve, reject) => {
-            const ref = setTimeout(() => reject('HTTP request timed out connecting to API endpoint.'), opConfig.timeout);
+            const ref = setTimeout(() => reject(new Error('HTTP request timed out connecting to API endpoint.')), opConfig.timeout);
 
             fetchData({ uri, json: true })
                 .then((results) => {

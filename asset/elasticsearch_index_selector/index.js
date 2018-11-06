@@ -45,23 +45,10 @@ function newProcessor(context, opConfig) {
      */
 
     return (data) => {
-        let fromElastic = false;
-        let dataArray = data;
-        const fullResponseData = _.get(dataArray, 'hits.hits');
-
-        if (fullResponseData) {
-            fromElastic = true;
-            dataArray = fullResponseData;
-        }
         const formatted = [];
 
         function generateRequest(start) {
-            let record;
-            if (fromElastic) {
-                record = dataArray[start]._source;
-            } else {
-                record = dataArray[start];
-            }
+            const record = data[start];
             const indexSpec = {};
 
             const meta = {
@@ -70,7 +57,6 @@ function newProcessor(context, opConfig) {
             };
 
             if (opConfig.preserve_id) meta._id = DataEntity.getMetadata(record, '_key');
-            if (fromElastic) meta._id = data.hits.hits[start]._id;
             if (opConfig.id_field) meta._id = record[opConfig.id_field];
 
             if (opConfig.update || opConfig.upsert) {
@@ -132,7 +118,7 @@ function newProcessor(context, opConfig) {
             }
         }
 
-        for (let i = 0; i < dataArray.length; i += 1) {
+        for (let i = 0; i < data.length; i += 1) {
             generateRequest(i);
         }
 

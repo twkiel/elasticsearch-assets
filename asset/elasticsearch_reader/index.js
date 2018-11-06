@@ -101,11 +101,6 @@ function schema() {
                 dateOptions(interval[2]);
             }
         },
-        full_response: {
-            doc: 'DEPRECIATED : Set to true to receive the full Elasticsearch query response including index metadata.',
-            default: false,
-            format: Boolean
-        },
         preserve_id: {
             doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',
             default: false,

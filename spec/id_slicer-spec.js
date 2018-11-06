@@ -73,7 +73,7 @@ describe('id_reader', () => {
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 type: 'events-',
-                index: 'ab'
+                index: 'someindex'
             }]
         };
         const executionConfig2 = {
@@ -83,7 +83,7 @@ describe('id_reader', () => {
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 type: 'events-',
-                index: 'ab'
+                index: 'someindex'
             }]
         };
 
@@ -104,7 +104,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -129,7 +129,7 @@ describe('id_reader', () => {
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b', 'c', 'd'],
                 starting_key_depth: 3,
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -153,7 +153,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -189,7 +189,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -221,7 +221,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };
@@ -254,7 +254,7 @@ describe('id_reader', () => {
                 type: 'events-',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                index: 'ab',
+                index: 'someindex',
                 size: 200
             }]
         };

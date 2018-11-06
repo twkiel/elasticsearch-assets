@@ -18,7 +18,7 @@ class MockClient {
         this.indices.getSettings = async () => {
             const window = 10000;
             return {
-                'some-index': {
+                someindex: {
                     settings: {
                         index: {
                             max_result_window: window
