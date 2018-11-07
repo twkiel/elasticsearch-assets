@@ -12,8 +12,8 @@
   "dependencies": {
     "@terascope/elasticsearch-api": "^1.1.2",
     "@terascope/error-parser": "^1.0.1",
-    "@terascope/job-components": "^0.8.2",
-    "bluebird": "^3.5.2",
+    "@terascope/job-components": "^0.9.0",
+    "bluebird": "^3.5.3",
     "datemath-parser": "^1.0.6",
     "lodash": "^4.17.11",
     "mocker-data-generator": "^2.6.6",

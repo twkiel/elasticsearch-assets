@@ -19,10 +19,10 @@
   dependencies:
     lodash "^4.17.11"
 
-"@terascope/job-components@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.8.2.tgz#ac095e0360f497fc240d11c5954687d95709ff55"
-  integrity sha512-j/gUtQ+G9Td1o1Uk5WgVK7vYmk03ki+2GuyrY4kiELu+n70o2ZB1J1iAosfbbii2p4nmqftjdjOO2YEsqSDYbg==
+"@terascope/job-components@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.9.0.tgz#cb9290c686ccc03a915582feb78a6bfc25c9aa10"
+  integrity sha512-jilSIdM+0rVlYbnM2r5Ev6Z14iYoxdUDwOZpcWfHaZIEHds0/qvTbOI7Z9nMyJNnsL0d5Rwaec6b8RAJSj4c9g==
   dependencies:
     "@terascope/queue" "^1.1.4"
     convict "^4.4.0"
@@ -87,6 +87,11 @@ bluebird@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.2.tgz#1be0908e054a751754549c270489c1505d4ab15a"
   integrity sha512-dhHTWMI7kMx5whMQntl7Vr9C6BvV10lFXDAasnqnrMYhXVCzzk6IO9Fo2L75jXHT07WrOngL1WDXOp+yYS91Yg==
+
+bluebird@^3.5.3:
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.3.tgz#7d01c6f9616c9a51ab0f8c549a79dfe6ec33efa7"
+  integrity sha512-/qKPUQlaW1OyR51WeCPBvRnAlnZFUJkCSG5HzGnuIqhgyJtF+T94lFnn33eiazjRm2LAHVy2guNnaq48X9SJuw==
 
 camelcase@^4.1.0:
   version "4.1.0"
