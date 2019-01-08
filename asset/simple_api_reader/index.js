@@ -56,7 +56,7 @@ function createClient(context, opConfig) {
                         if (queryFn) {
                             const queryStr = queryFn(config);
                             if (query.length) {
-                                query = `${query} AND ${queryStr}`;
+                                query = `(${query}) AND ${queryStr}`;
                             } else {
                                 query = queryStr;
                             }
