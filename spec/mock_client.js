@@ -51,7 +51,7 @@ class MockClient {
             obj => ({
                 _shards: { failed: 0 },
                 hits: {
-                    total: obj.count !== undefined ? obj.count : 100,
+                    total: obj.count != null ? obj.count : 100,
                     hits: [{ _source: obj }]
                 }
             })

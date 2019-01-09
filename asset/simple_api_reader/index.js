@@ -1,14 +1,15 @@
 'use strict';
 
+const { getOpConfig } = require('@terascope/job-components');
 const Promise = require('bluebird');
 const _ = require('lodash');
-const request = require('request-promise');
+const got = require('got');
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-function getOpConfig(job, name) {
-    return job.operations.find(op => op._op === name);
+function request({ uri }) {
+    return got(uri, { json: true }).then(response => response.body);
 }
 
 const MODULE_NAME = 'simple_api_reader';
@@ -30,7 +31,7 @@ function createClient(context, opConfig) {
                 })
                 .catch((err) => {
                     clearTimeout(ref);
-                    return reject(err);
+                    reject(err);
                 });
         });
     }
@@ -77,7 +78,7 @@ function createClient(context, opConfig) {
                 });
             }
             let { size } = queryConfig;
-            if (size === undefined) {
+            if (size == null) {
                 ({ size } = opConfig);
             }
             const initialQuery = `${opConfig.endpoint}/${opConfig.index}?token=${opConfig.token}&`;

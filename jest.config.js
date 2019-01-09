@@ -2,6 +2,7 @@
 
 module.exports = {
     rootDir: '.',
+    verbose: true,
     testMatch: [
         '<rootDir>/spec/*-spec.js'
     ],
@@ -11,6 +12,6 @@ module.exports = {
         '<rootDir>/asset/*/*.js',
         '!<rootDir>/asset/node_modules',
     ],
-    coverageReporters: ['lcov', 'text-summary', 'html'],
+    coverageReporters: ['lcov', 'text', 'html'],
     coverageDirectory: '<rootDir>/coverage'
 };

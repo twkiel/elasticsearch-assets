@@ -156,7 +156,7 @@ function newProcessor(context, opConfig) {
         logger = loggerIn;
 
         // bulk throws an error if you send an empty array
-        if (data === undefined || data.length === 0) {
+        if (data == null || data.length === 0) {
             return Promise.resolve(data);
         }
 
