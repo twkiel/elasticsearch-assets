@@ -54,7 +54,9 @@ function createClient(context, opConfig) {
                     _.forOwn(queryAction, (config, key) => {
                         const queryFn = queryOptions[key];
                         if (queryFn) {
-                            const queryStr = queryFn(config);
+                            let queryStr = queryFn(config);
+                            if (key !== 'range') queryStr = `(${queryStr})`;
+
                             if (query.length) {
                                 query = `${query} AND ${queryStr}`;
                             } else {

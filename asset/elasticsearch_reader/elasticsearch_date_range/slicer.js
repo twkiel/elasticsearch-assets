@@ -226,13 +226,13 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                     // increase the slice range to find documents
                     const newEnd = moment(dateParams.end).add(intervalNum, intervalUnit);
                     if (newEnd.isSameOrAfter(dateParams.limit)) {
-                        // if it zero and at the end, just finish
+                        // set to limit
                         dateParams.end = dateParams.limit;
                     } else {
                         dateParams.end = newEnd;
-                        events.emit('slicer:slice:range_expansion');
-                        return determineSlice(dateParams, slicerId, true);
                     }
+                    events.emit('slicer:slice:range_expansion');
+                    return determineSlice(dateParams, slicerId, true);
                 }
 
                 return { start: dateParams.start, end: dateParams.end, count };
