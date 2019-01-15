@@ -37,6 +37,8 @@ function createClient(context, opConfig) {
     }
 
     function apiSearch(queryConfig) {
+        const fields = _.get(queryConfig, '_source', null);
+        const fieldsQuery = fields ? `&fields=${fields.join(',')}` : '';
         const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
         const searchQuery = parseQueryConfig(mustQuery);
 
@@ -84,7 +86,7 @@ function createClient(context, opConfig) {
                 ({ size } = opConfig);
             }
             const initialQuery = `${opConfig.endpoint}/${opConfig.index}?token=${opConfig.token}&`;
-            return `${initialQuery}q=${query}&size=${size}${sort}${geoQuery}`;
+            return `${initialQuery}q=${query}&size=${size}${sort}${geoQuery}${fieldsQuery}`;
         }
 
         function _parseGeoQuery() {
