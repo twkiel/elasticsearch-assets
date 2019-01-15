@@ -94,7 +94,7 @@ describe('simple_api_reader', () => {
         index: 'details-subset',
         endpoint: 'https://localhost:8000',
         token: 'test-token',
-        fields: ['ip', 'bytes', 'created'],
+        fields: ['ip', 'bytes'],
         size: 5000,
         interval: '90d',
         date_field_name: 'date',
@@ -235,7 +235,7 @@ describe('simple_api_reader', () => {
         const url7 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing) AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url8 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100';
         const url9 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100&geo_box_top_left=34.5234,79.42345&geo_box_bottom_right=54.5234,80.3456&geo_sort_point=52.3456,79.6784';
-        const url10 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100&fields=ip,bytes,created';
+        const url10 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100&fields=ip,bytes,date';
 
         Promise.resolve()
             .then(() => client.search(query1))
