@@ -37,6 +37,11 @@ function createClient(context, opConfig) {
     }
 
     function apiSearch(queryConfig) {
+        const fields = _.get(queryConfig, '_source', null);
+        const dateFieldName = opConfig.date_field_name;
+        // put in the dateFieldName into fields so date reader can work
+        if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
+        const fieldsQuery = fields ? `&fields=${fields.join(',')}` : '';
         const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
         const searchQuery = parseQueryConfig(mustQuery);
 
@@ -73,9 +78,9 @@ function createClient(context, opConfig) {
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
                 queryConfig.body.sort.forEach((sortType) => {
                     // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
-                    if (sortType[opConfig.date_field_name]) {
+                    if (sortType[dateFieldName]) {
                         // {"date":{"order":"asc"}}
-                        sort = `&sort=${opConfig.date_field_name}:${queryConfig.body.sort[0][opConfig.date_field_name].order}`;
+                        sort = `&sort=${dateFieldName}:${queryConfig.body.sort[0][dateFieldName].order}`;
                     }
                 });
             }
@@ -84,7 +89,7 @@ function createClient(context, opConfig) {
                 ({ size } = opConfig);
             }
             const initialQuery = `${opConfig.endpoint}/${opConfig.index}?token=${opConfig.token}&`;
-            return `${initialQuery}q=${query}&size=${size}${sort}${geoQuery}`;
+            return `${initialQuery}q=${query}&size=${size}${sort}${geoQuery}${fieldsQuery}`;
         }
 
         function _parseGeoQuery() {
@@ -123,11 +128,11 @@ function createClient(context, opConfig) {
                 ({ range } = queryConfig.body.query);
             }
 
-            const dateStart = new Date(range[opConfig.date_field_name].gte);
-            const dateEnd = new Date(range[opConfig.date_field_name].lt);
+            const dateStart = new Date(range[dateFieldName].gte);
+            const dateEnd = new Date(range[dateFieldName].lt);
 
             // Teraslice date ranges are >= start and < end.
-            return `${opConfig.date_field_name}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
+            return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
         function callTeraserver(uri) {

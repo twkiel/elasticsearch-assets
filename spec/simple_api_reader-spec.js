@@ -89,6 +89,19 @@ describe('simple_api_reader', () => {
         timeout: 50
     };
 
+    const opConfig5 = {
+        _op: 'simple_api_reader',
+        index: 'details-subset',
+        endpoint: 'https://localhost:8000',
+        token: 'test-token',
+        fields: ['ip', 'bytes'],
+        size: 5000,
+        interval: '90d',
+        date_field_name: 'date',
+        query: 'bytes:>=2000',
+        timeout: 50
+    };
+
     const context = {
         __test_mocks: (query) => {
             allRequests.push(query.uri);
@@ -183,6 +196,7 @@ describe('simple_api_reader', () => {
 
         const queryOpConfig = Object.assign({}, opConfig, { query: 'test:query' });
         const geoOpConfig = Object.assign({}, opConfig2, { query: 'test:query' });
+        const fieldsOpConfig = Object.assign({}, opConfig5, { query: 'test:query' });
 
         const queryArgs1 = [luceneQuery, rangeQuery];
         const queryArgs2 = [luceneQuery, rangeQuery, geoQuery];
@@ -192,7 +206,6 @@ describe('simple_api_reader', () => {
 
         const query1 = makeQuery(opConfig, { count: 100 }, rangeQuery);
         const query2 = makeQuery(queryOpConfig, { count: 100 }, queryArgs1);
-
         const query3 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2, sort1);
         const query4 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2);
         const query5 = makeQuery(geoOpConfig, { count: 100 }, queryArgs2, sort2);
@@ -211,6 +224,7 @@ describe('simple_api_reader', () => {
         const query7 = makeQuery(queryOpConfig, { count: 100 }, queryArgs3);
         const query8 = makeQuery(queryOpConfig, { count: 100 }, queryArgs4);
         const query9 = makeQuery(geoOpConfig, { count: 100 }, queryArgs5);
+        const query10 = makeQuery(fieldsOpConfig, { count: 100 }, queryArgs4);
 
         const url1 = 'https://localhost:8000/details-subset?token=test-token&q=date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url2 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query) AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
@@ -221,6 +235,7 @@ describe('simple_api_reader', () => {
         const url7 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing) AND date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}&size=100';
         const url8 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100';
         const url9 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100&geo_box_top_left=34.5234,79.42345&geo_box_bottom_right=54.5234,80.3456&geo_sort_point=52.3456,79.6784';
+        const url10 = 'https://localhost:8000/details-subset?token=test-token&q=(test:query OR other:thing)&size=100&fields=ip,bytes,date';
 
         Promise.resolve()
             .then(() => client.search(query1))
@@ -267,6 +282,11 @@ describe('simple_api_reader', () => {
             .then(() => {
                 const url = allRequests.pop();
                 expect(url).toEqual(url9);
+                return client.search(query10);
+            })
+            .then(() => {
+                const url = allRequests.pop();
+                expect(url).toEqual(url10);
             })
             .catch(fail)
             .finally(done);
