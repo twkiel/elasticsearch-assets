@@ -415,6 +415,55 @@ describe('elasticsearch_reader', () => {
         opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
     });
 
+    it('slicer can do an expansion of date slices up to find data even when none is returned', async () => {
+        const firstDate = moment();
+        const endDate = moment(firstDate).add(10, 'm');
+        const closingDate = moment(endDate).add(1, 's');
+
+        const opConfig = {
+            _op: 'elasticsearch_reader',
+            date_field_name: '@timestamp',
+            time_resolution: 's',
+            size: 100,
+            index: 'someindex',
+            interval: '5m',
+        };
+
+        const executionConfig = { lifecycle: 'once', slicers: 1, operations: [opConfig] };
+        // first two objects are consumed for determining start and end dates,
+        // a middleDate is used in recursion to expand,
+        client.setSequenceData([
+            { '@timestamp': firstDate, count: 100 },
+            { '@timestamp': endDate, count: 100 },
+            { count: 0 },
+            { count: 0 },
+            { count: 0 },
+            { count: 0 }
+        ]);
+
+        let hasExpanded = false;
+        function hasExpandedFn() {
+            hasExpanded = true;
+            return true;
+        }
+
+        opTest.events.on('slicer:slice:range_expansion', hasExpandedFn);
+
+        const test = await opTest.init({ executionConfig });
+        const [results] = await test.run();
+
+        expect(results.start).toEqual(firstDate.format());
+        expect(results.end).toEqual(closingDate.format());
+        expect(results.count).toEqual(0);
+
+        expect(hasExpanded).toEqual(true);
+
+        const results2 = await test.run();
+        expect(results2).toEqual([null]);
+
+        opTest.events.removeListener('slicer:slice:range_expansion', hasExpandedFn);
+    });
+
     it('slicer can do expansion of date slices with large slices', async () => {
         const firstDate = moment();
         const middleDate = moment(firstDate).add(5, 'm');

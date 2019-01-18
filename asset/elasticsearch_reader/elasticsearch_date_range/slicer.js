@@ -174,7 +174,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
         return secondDiff;
     }
 
-    function determineSlice(dateParams, slicerId, isExpandedSlice) {
+    function determineSlice(dateParams, slicerId, isExpandedSlice, isLimitQuery) {
         return getCount(dateParams)
             .then((count) => {
                 const intervalNum = dateParams.interval[0];
@@ -221,18 +221,21 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                 }
 
                 // interval is only passed in with once mode, it will expand slices to prevent
-                // counts of 0
-                if (count === 0 && dateParams.interval) {
+                // counts of 0, if the limit is reached it will run once more for the correct count
+                // then it should return and not recurse further if there is still no data
+                if (!isLimitQuery && count === 0 && dateParams.interval) {
                     // increase the slice range to find documents
+                    let makeLimitQuery = false;
                     const newEnd = moment(dateParams.end).add(intervalNum, intervalUnit);
                     if (newEnd.isSameOrAfter(dateParams.limit)) {
                         // set to limit
+                        makeLimitQuery = true;
                         dateParams.end = dateParams.limit;
                     } else {
                         dateParams.end = newEnd;
                     }
                     events.emit('slicer:slice:range_expansion');
-                    return determineSlice(dateParams, slicerId, true);
+                    return determineSlice(dateParams, slicerId, true, makeLimitQuery);
                 }
 
                 return { start: dateParams.start, end: dateParams.end, count };
