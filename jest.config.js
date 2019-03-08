@@ -3,8 +3,11 @@
 module.exports = {
     rootDir: '.',
     verbose: true,
+    setupFilesAfterEnv: [
+        'jest-extended'
+    ],
     testMatch: [
-        '<rootDir>/spec/*-spec.js'
+        '<rootDir>/test/*-spec.js'
     ],
     collectCoverage: true,
     collectCoverageFrom: [

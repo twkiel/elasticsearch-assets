@@ -1,32 +1,32 @@
 {
-  "name": "elasticsearch-assets",
-  "description": "bundle of processors for teraslice",
-  "version": "1.2.5",
-  "main": "index.js",
-  "scripts": {
-    "build": "scripts/build.sh",
-    "lint": "eslint asset/**/*.js spec/**/*.js",
-    "lint:fix": "eslint --fix asset/**/*.js spec/**/*.js",
-    "test": "jest",
-    "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
-    "postinstall": "yarn --cwd ./asset --prod --silent --no-progress"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jsnoble/elasticsearch-assets.git"
-  },
-  "author": "Terascope, LLC <info@terascope.io>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jsnoble/elasticsearch-assets/issues"
-  },
-  "homepage": "https://github.com/jsnoble/elasticsearch-assets#readme",
-  "dependencies": {},
-  "devDependencies": {
-    "@terascope/teraslice-op-test-harness": "~1.4.5",
-    "eslint": "^5.10.0",
-    "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "jest": "^23.6.0"
-  }
+    "name": "elasticsearch-assets",
+    "description": "bundle of processors for teraslice",
+    "version": "1.3.0",
+    "main": "index.js",
+    "scripts": {
+        "lint": "eslint asset/**/*.js test/**/*.js",
+        "lint:fix": "eslint --fix asset/**/*.js test/**/*.js",
+        "test": "jest",
+        "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
+        "postinstall": "yarn --cwd ./asset --prod --no-progress"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jsnoble/elasticsearch-assets.git"
+    },
+    "author": "Terascope, LLC <info@terascope.io>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/jsnoble/elasticsearch-assets/issues"
+    },
+    "homepage": "https://github.com/jsnoble/elasticsearch-assets#readme",
+    "dependencies": {},
+    "devDependencies": {
+        "@terascope/teraslice-op-test-harness": "~1.5.4",
+        "eslint": "^5.15.1",
+        "eslint-config-airbnb-base": "^13.0.0",
+        "eslint-plugin-import": "^2.16.0",
+        "jest": "^24.3.1",
+        "jest-extended": "^0.11.1"
+    }
 }
