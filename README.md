@@ -15,7 +15,8 @@ teraslice-cli assets <cluster-alias> deploy --build
 ```
 
 ## Operations
- * [processor documentation](./docs/ops_reference.md)
+
+ * [Processor Documentation](./docs/ops_reference.md)
 
 ## Contributing
 
