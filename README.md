@@ -1,24 +1,28 @@
 # elasticsearch-assets
-bundle of processors for teraslice
 
-# Installation and use
+> A bundle of Teraslice processors for reading and writing elasticsearch data
 
-Inside root dir run:
-```yarn install```
+## Getting Started
 
-After root dependencies are installed we now need to load the asset dependencies
+This asset bundle requires a running Teraslice cluster, you can find the documentation [here](https://github.com/terascope/teraslice/blob/master/README.md).
 
-```
-cd asset
-yarn install
-```
+```bash
+# Step 1: make sure you have teraslice-cli installed
+yarn global add teraslice-cli
 
-After everything is installed we now zip the asset folder and send the asset
-```
-cd ..  //return to root folder
-zip -r asset.zip ./asset
-curl -XPOST -H "Content-Type: application/octet-stream" TERASLICE_HOSTNAME:5678/assets --data-binary @asset.zip
+# Step 2:
+teraslice-cli assets <cluster-alias> deploy --build
 ```
 
 ## Operations
  * [processor documentation](./docs/ops_reference.md)
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+
+[MIT](./LICENSE) licensed.
