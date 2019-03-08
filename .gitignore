@@ -62,3 +62,4 @@ typings/
 
 # Teraslice Asset Bundle Zipfiles
 builds/
+build/

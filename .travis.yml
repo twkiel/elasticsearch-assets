@@ -5,12 +5,14 @@ node_js:
 os:
   - linux
   - osx
-before_deploy: yarn build
+after_success:
+  - yarn global add teraslice-cli
+  - teraslice-cli assets build
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
   file_glob: true
-  file: builds/*.zip
+  file: build/*.zip
   skip_cleanup: true
   on:
     tags: true
