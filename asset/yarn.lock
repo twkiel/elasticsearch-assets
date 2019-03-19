@@ -28,13 +28,13 @@
   dependencies:
     lodash.get "^4.4.2"
 
-"@terascope/job-components@^0.15.0":
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.15.0.tgz#9174470a13b65cb4be0afcb91bda346e717466ac"
-  integrity sha512-F9JJS781fsJoZWfGmuMDs9b8E04k4XZRSjqTnYsRIebc18w90Z8vV/++hALTpd/rusAYD32OMgSpe44ZTBQCVw==
+"@terascope/job-components@^0.15.1":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.15.1.tgz#0a34523fbf64c12db57903b3d0cdf7171bae2466"
+  integrity sha512-XWVc4Pg7g977LIfNKm76nvJa+FyYtzyE6mHy+1B++UhE4S1YnOBJxCPKvgdH9xjQxsq9zlrEX8Ri0DVBYbuFDw==
   dependencies:
     "@terascope/queue" "^1.1.6"
-    "@terascope/utils" "^0.6.0"
+    "@terascope/utils" "^0.7.0"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
     uuid "^3.3.2"
@@ -48,6 +48,16 @@
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.6.0.tgz#72a226ef3f675b3b5b561b4a2d5491af6991af99"
   integrity sha512-Aeztbtd6Rn6dQ6pfCfIFSAXRiO5N0lFmNvu6cTPyxsqtjyPMe8jv5Jgtz3Guh+PX6trktvMVNzQNhsTel9Nc4A==
+  dependencies:
+    debug "^4.1.1"
+    is-plain-object "^2.0.4"
+    kind-of "^6.0.2"
+    lodash.clonedeep "^4.5.0"
+
+"@terascope/utils@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.7.0.tgz#5be95deae853dd8558f9e8ebc6409cb4ff2c4e4f"
+  integrity sha512-5G9vPQ0pqaiGkV3YlASzYhC94fJAUAuc3uxh5dH7N0FNVFZ6mS7ZwCbTVoU5iXK6DeJVqZmNVUB8h0ghbdol2g==
   dependencies:
     debug "^4.1.1"
     is-plain-object "^2.0.4"

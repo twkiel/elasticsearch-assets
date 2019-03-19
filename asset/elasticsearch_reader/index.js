@@ -12,9 +12,9 @@ function newSlicer(context, executionContext, retryData, logger) {
     return require('./elasticsearch_date_range/slicer.js')(context, opConfig, executionContext, retryData, logger, client);
 }
 
-function newReader(context, opConfig, executionConfig) {
+function newReader(context, opConfig) {
     const client = getClient(context, opConfig, 'elasticsearch');
-    return require('./elasticsearch_date_range/reader.js')(context, opConfig, executionConfig, client);
+    return require('./reader.js')(opConfig, client);
 }
 
 function schema() {

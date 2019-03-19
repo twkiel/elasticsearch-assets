@@ -3,7 +3,7 @@
 const elasticApi = require('@terascope/elasticsearch-api');
 const { DataEntity } = require('@terascope/job-components');
 
-function newReader(context, opConfig, executionConfig, client) {
+function newReader(opConfig, client) {
     const queryConfig = Object.assign({}, opConfig, { full_response: true });
 
     return (msg, logger) => {
