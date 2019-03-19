@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const elasticApi = require('@terascope/elasticsearch-api');
 const { getClient, getOpConfig } = require('@terascope/job-components');
 
 function newSlicer(context, executionContext, retryData, logger) {
@@ -14,13 +13,7 @@ function newSlicer(context, executionContext, retryData, logger) {
 
 function newReader(context, opConfig) {
     const client = getClient(context, opConfig, 'elasticsearch');
-
-    return (msg, logger) => {
-        // TODO look for a better way to inject logger
-        const elasticsearch = elasticApi(client, logger, opConfig);
-        const query = elasticsearch.buildQuery(opConfig, msg);
-        return elasticsearch.search(query);
-    };
+    return require('../elasticsearch_reader')(opConfig, client);
 }
 
 function schema() {
