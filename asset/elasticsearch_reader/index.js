@@ -4,17 +4,19 @@ const moment = require('moment');
 const dateMath = require('datemath-parser');
 const elasticApi = require('@terascope/elasticsearch-api');
 const { getOpConfig, getClient } = require('@terascope/job-components');
+const slicerFn = require('./elasticsearch_date_range/slicer');
+const readerFn = require('./reader');
 const { dateOptions } = require('../utils');
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, 'elasticsearch_reader');
     const client = getClient(context, opConfig, 'elasticsearch');
-    return require('./elasticsearch_date_range/slicer.js')(context, opConfig, executionContext, retryData, logger, client);
+    return slicerFn(context, opConfig, executionContext, retryData, logger, client);
 }
 
 function newReader(context, opConfig) {
     const client = getClient(context, opConfig, 'elasticsearch');
-    return require('./reader.js')(opConfig, client);
+    return readerFn(opConfig, client);
 }
 
 function schema() {

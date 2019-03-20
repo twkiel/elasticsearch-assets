@@ -2,18 +2,20 @@
 
 const _ = require('lodash');
 const { getClient, getOpConfig } = require('@terascope/job-components');
+const readerFn = require('../elasticsearch_reader/reader');
+const slicerFn = require('./id_slicer');
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, 'id_reader');
     const client = getClient(context, opConfig, 'elasticsearch');
 
-    return require('./id_slicer')(context, client, executionContext, opConfig, logger, retryData);
+    return slicerFn(context, client, executionContext, opConfig, logger, retryData);
 }
 
 
 function newReader(context, opConfig) {
     const client = getClient(context, opConfig, 'elasticsearch');
-    return require('../elasticsearch_reader')(opConfig, client);
+    return readerFn(opConfig, client);
 }
 
 function schema() {
