@@ -275,4 +275,23 @@ describe('id_reader', () => {
         const [slice5] = await test.run();
         expect(slice5).toEqual({ count: 100, key: 'events-#ab*' });
     });
+
+    it('newReader returns a function that queries elasticsearch', async () => {
+        const executionConfig = {
+            lifecycle: 'once',
+            operations: [{
+                _op: 'id_reader',
+                type: 'events-',
+                key_type: 'hexadecimal',
+                key_range: ['a', 'b'],
+                index: 'someindex',
+                size: 200
+            }]
+        };
+
+        const type = 'reader';
+
+        const reader = await opTest.init({ executionConfig, type });
+        expect(typeof reader.operation).toEqual('object');
+    });
 });
