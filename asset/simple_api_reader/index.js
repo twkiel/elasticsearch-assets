@@ -4,6 +4,8 @@ const { getOpConfig } = require('@terascope/job-components');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const got = require('got');
+const readerFn = require('../elasticsearch_reader/reader');
+const slicerFn = require('../elasticsearch_reader/elasticsearch_date_range/slicer');
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -207,12 +209,12 @@ function createClient(context, opConfig) {
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, MODULE_NAME);
     const client = createClient(context, opConfig);
-    return require('../elasticsearch_reader/elasticsearch_date_range/slicer')(context, opConfig, executionContext, retryData, logger, client);
+    return slicerFn(context, opConfig, executionContext, retryData, logger, client);
 }
 
 function newReader(context, opConfig, jobConfig) {
     const client = createClient(context, opConfig);
-    return require('../elasticsearch_reader/elasticsearch_date_range/reader')(context, opConfig, jobConfig, client);
+    return readerFn(context, opConfig, jobConfig, client);
 }
 
 function schema() {
