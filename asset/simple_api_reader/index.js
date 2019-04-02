@@ -4,6 +4,7 @@ const { getOpConfig } = require('@terascope/job-components');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const got = require('got');
+const reader = require('../elasticsearch_reader');
 const readerFn = require('../elasticsearch_reader/reader');
 const slicerFn = require('../elasticsearch_reader/elasticsearch_date_range/slicer');
 
@@ -218,7 +219,7 @@ function newReader(context, opConfig, jobConfig) {
 }
 
 function schema() {
-    const esSchema = require('../elasticsearch_reader').schema();
+    const esSchema = reader.schema();
     const apiSchema = {
         endpoint: {
             doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
