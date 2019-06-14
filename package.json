@@ -22,7 +22,7 @@
     "homepage": "https://github.com/jsnoble/elasticsearch-assets#readme",
     "dependencies": {},
     "devDependencies": {
-        "@terascope/teraslice-op-test-harness": "~1.5.5",
+        "@terascope/teraslice-op-test-harness": "~1.6.0",
         "eslint": "^5.16.0",
         "eslint-config-airbnb-base": "^13.0.0",
         "eslint-plugin-import": "^2.16.0",
