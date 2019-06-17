@@ -5,6 +5,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const dateMath = require('datemath-parser');
 const parseError = require('@terascope/error-parser');
+const elasticApi = require('@terascope/elasticsearch-api');
 const {
     dateOptions,
     retryModule,
@@ -22,7 +23,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
     const dateFormat = timeResolution === 'ms' ? dateFormatMS : dateFormatS;
     // This could be different since we have another op that uses this module
     const opName = opConfig._op;
-    const elasticsearch = require('@terascope/elasticsearch-api')(client, logger, opConfig);
+    const elasticsearch = elasticApi(client, logger, opConfig);
 
     function processInterval(str, esDates) {
         if (!moment(new Date(str)).isValid()) {

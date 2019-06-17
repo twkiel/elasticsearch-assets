@@ -1,19 +1,15 @@
 'use strict';
 
-const { getOpConfig } = require('@terascope/job-components');
-const Promise = require('bluebird');
-const _ = require('lodash');
 const got = require('got');
-const reader = require('../elasticsearch_reader');
-const readerFn = require('../elasticsearch_reader/reader');
+const _ = require('lodash');
+const Promise = require('bluebird');
+const { getOpConfig, TSError } = require('@terascope/job-components');
 const slicerFn = require('../elasticsearch_reader/elasticsearch_date_range/slicer');
+const readerFn = require('../elasticsearch_reader/reader');
+const reader = require('../elasticsearch_reader');
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-function request({ uri }) {
-    return got(uri, { json: true }).then(response => response.body);
-}
 
 const MODULE_NAME = 'simple_api_reader';
 
@@ -21,22 +17,32 @@ function createClient(context, opConfig) {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     const { logger } = context;
-    const fetchData = context.__test_mocks || request;
 
-    function makeRequest(uri) {
-        return new Promise((resolve, reject) => {
-            const ref = setTimeout(() => reject(new Error('HTTP request timed out connecting to API endpoint.')), opConfig.timeout);
-
-            fetchData({ uri, json: true })
-                .then((results) => {
-                    clearTimeout(ref);
-                    resolve(results);
-                })
-                .catch((err) => {
-                    clearTimeout(ref);
-                    reject(err);
+    async function makeRequest(uri) {
+        // REMOVEME
+        logger.debug({ uri }, 'make request');
+        try {
+            const { body } = await got(uri, {
+                json: true,
+                timeout: opConfig.timeout,
+                retry: 0
+            });
+            return body;
+        } catch (err) {
+            if (err instanceof got.TimeoutError) {
+                throw new TSError('HTTP request timed out connecting to API endpoint.', {
+                    context: {
+                        endpoint: uri
+                    }
                 });
-        });
+            }
+            throw new TSError(err, {
+                reason: 'Failure making search request',
+                context: {
+                    endpoint: uri
+                }
+            });
+        }
     }
 
     function apiSearch(queryConfig) {
@@ -213,9 +219,9 @@ function newSlicer(context, executionContext, retryData, logger) {
     return slicerFn(context, opConfig, executionContext, retryData, logger, client);
 }
 
-function newReader(context, opConfig, jobConfig) {
+function newReader(context, opConfig) {
     const client = createClient(context, opConfig);
-    return readerFn(context, opConfig, jobConfig, client);
+    return readerFn(opConfig, client);
 }
 
 function schema() {
