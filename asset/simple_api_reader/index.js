@@ -19,6 +19,8 @@ function createClient(context, opConfig) {
     const { logger } = context;
 
     async function makeRequest(uri) {
+        // REMOVEME
+        logger.debug({ uri }, 'make request');
         try {
             const { body } = await got(uri, {
                 json: true,
