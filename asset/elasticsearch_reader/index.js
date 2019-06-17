@@ -3,10 +3,12 @@
 const moment = require('moment');
 const dateMath = require('datemath-parser');
 const elasticApi = require('@terascope/elasticsearch-api');
-const { getOpConfig, getClient } = require('@terascope/job-components');
+const { getOpConfig, getClient, debugLogger } = require('@terascope/job-components');
 const slicerFn = require('./elasticsearch_date_range/slicer');
 const readerFn = require('./reader');
 const { dateOptions } = require('../utils');
+
+const _logger = debugLogger('elastisearch-reader');
 
 function newSlicer(context, executionContext, retryData, logger) {
     const opConfig = getOpConfig(executionContext.config, 'elasticsearch_reader');
@@ -279,7 +281,8 @@ function selfValidation(op) {
             throw new Error('If subslice_by_key is set to true, the elasticsearch type parameter of the documents must also be set');
         }
     }
-    elasticApi({}).validateGeoParameters(op);
+
+    elasticApi({}, _logger).validateGeoParameters(op);
 }
 
 function crossValidation(job) {

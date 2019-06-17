@@ -7,6 +7,7 @@
         "lint": "eslint asset/**/*.js test/**/*.js",
         "lint:fix": "eslint --fix asset/**/*.js test/**/*.js",
         "test": "jest",
+        "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
         "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
         "postinstall": "yarn --cwd ./asset --prod --no-progress"
     },
@@ -22,6 +23,7 @@
     "homepage": "https://github.com/jsnoble/elasticsearch-assets#readme",
     "dependencies": {},
     "devDependencies": {
+        "@terascope/job-components": "^0.18.0",
         "@terascope/teraslice-op-test-harness": "~1.6.0",
         "eslint": "^5.16.0",
         "eslint-config-airbnb-base": "^13.0.0",

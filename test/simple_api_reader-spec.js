@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
+const { debugLogger } = require('@terascope/job-components');
 const processor = require('../asset/simple_api_reader');
 
 function makeQuery(opConfig, msg, data, sort) {
@@ -113,13 +114,7 @@ describe('simple_api_reader', () => {
                 }, timeout);
             });
         },
-        logger: {
-            error: () => {},
-            info: () => {},
-            warn: () => {},
-            debug: () => {},
-            trace: () => {}
-        }
+        logger: debugLogger('simple-api-reader-spec')
     };
 
     beforeEach(() => {
