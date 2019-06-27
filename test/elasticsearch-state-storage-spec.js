@@ -100,11 +100,10 @@ describe('elasticsearch state storage api', () => {
         noopBar = harness.getOperation(2);
         const reader = harness.getOperation('test-reader');
         const fn = reader.fetch.bind(reader);
-        // TODO: we do not have a good story around added meta data to testing data
+        // NOTE: we do not have a good story around added meta data to testing data
         reader.fetch = async incDocs => fn(incDocs.map(addTestMeta));
 
         noopFoo.onBatch = async (docs) => {
-            // FIXME: because of bug use getAPI, after fix use createAPI
             const results = [];
             const { state_storage_api: name } = noopFoo.opConfig;
             const stateStorage = noopFoo.getAPI(name);
