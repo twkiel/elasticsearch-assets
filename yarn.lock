@@ -305,6 +305,17 @@
     datemath-parser "^1.0.6"
     uuid "^3.3.2"
 
+"@terascope/job-components@^0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.20.0.tgz#52a0233cfdc45c4f3c3486073f846b08b00e997b"
+  integrity sha512-L3d1rox/IvVLSNKZhbwHI7izi9Hv+dKhX7rql46TNhK5QCvsFCh0r5wwgneYVK4qFhoW4mMLB5+73ILwrJA5mg==
+  dependencies:
+    "@terascope/queue" "^1.1.6"
+    "@terascope/utils" "^0.11.0"
+    convict "^4.4.1"
+    datemath-parser "^1.0.6"
+    uuid "^3.3.2"
+
 "@terascope/queue@^1.1.6":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
