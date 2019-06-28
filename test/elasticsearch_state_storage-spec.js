@@ -60,11 +60,15 @@ describe('elasticsearch state storage api', () => {
         max_retries: 3,
         apis: [
             {
-                _name: 'elasticsearch-state-storage:foo',
+                _name: 'elasticsearch_state_storage:foo',
+                index: 'someIndex',
+                type: 'type',
                 id_field: idField
             },
             {
-                _name: 'elasticsearch-state-storage:bar',
+                _name: 'elasticsearch_state_storage:bar',
+                index: 'someIndex',
+                type: 'type',
                 id_field: idField
             }
         ],
@@ -75,11 +79,11 @@ describe('elasticsearch state storage api', () => {
             },
             {
                 _op: 'noop',
-                state_storage_api: 'elasticsearch-state-storage:foo'
+                state_storage_api: 'elasticsearch_state_storage:foo'
             },
             {
                 _op: 'noop',
-                state_storage_api: 'elasticsearch-state-storage:bar'
+                state_storage_api: 'elasticsearch_state_storage:bar'
             }
         ],
     });
