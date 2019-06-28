@@ -283,21 +283,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
-"@terascope/job-components@^0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.17.0.tgz#74caf9ca964ead4eb6b4eddfb10b51c6e48dc332"
-  integrity sha512-Q8/jGJ1uPK5e0MvyEURRZnGH/iyX7J4d9vX7y27Y7B10w8BDijAYnZJZaW8jy9XbZJnhKWywRfHkfVJ0bmJZpA==
-  dependencies:
-    "@terascope/queue" "^1.1.6"
-    "@terascope/utils" "^0.10.2"
-    convict "^4.4.1"
-    datemath-parser "^1.0.6"
-    uuid "^3.3.2"
-
-"@terascope/job-components@^0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.19.0.tgz#280f9348e9e30ba709e500fb01b1bc15245b5a9a"
-  integrity sha512-CuxdFeoyu1OcIYUIH64xwvTD13+dL9rTM+t7/36aTZZ5pK3sQ/wE4b9kPAaYcANX7LJPfuaVdToD8Cs6vpKm0Q==
+"@terascope/job-components@^0.20.0", "@terascope/job-components@^0.20.1":
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.20.1.tgz#8cbb678e60cd452cd5683152ada76a5cdbe420f6"
+  integrity sha512-+VK/P1zMr0bABdYkVwoSQnIljE1euoHXXjoNz3DMk0Wm5YvF/fREMJrQ/vTukBCEv3jfsx7LseSea8vnkzDBRg==
   dependencies:
     "@terascope/queue" "^1.1.6"
     "@terascope/utils" "^0.11.0"
@@ -310,26 +299,14 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
-"@terascope/teraslice-op-test-harness@^1.6.0", "@terascope/teraslice-op-test-harness@~1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.6.0.tgz#c92b3d6f895c7bcc0f7685d6b1c2754bac5f20be"
-  integrity sha512-GSW3gzW1uBVzkYgcotljyqCJVapPu+uzJ7cq/e8pNWYkoGf9xWq8762pzMYeIx6KeBkFlb6v5Aufh7M6bamSgQ==
+"@terascope/teraslice-op-test-harness@^1.6.0", "@terascope/teraslice-op-test-harness@~1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.7.0.tgz#edeceff4983a448767dc5d576b2db490f1c181af"
+  integrity sha512-l+lH9EnNlYOJN3kS2NVpdCChatsJR5OiJnDlW8BXIW/8u79MAFY8KVt/kUAXNHjk9QKJYa8n4YDxfWF8w6kKkw==
   dependencies:
-    "@terascope/job-components" "^0.17.0"
-    bluebird "^3.5.4"
+    "@terascope/job-components" "^0.20.0"
+    bluebird "^3.5.5"
     lodash "^4.17.11"
-
-"@terascope/utils@^0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.10.2.tgz#fcaba3ade6c5546f3fa2f755dec7969095b826d3"
-  integrity sha512-HQ9ML+Q3w3PSMS9O3Or82QDGYjkyRRTFRO/vfWdlGCI/xK/b2nEX9eVnuhKvHSY7OOJiTHjS+o/epIuP1pj6og==
-  dependencies:
-    debug "^4.1.1"
-    is-plain-object "^3.0.0"
-    kind-of "^6.0.2"
-    lodash.clonedeep "^4.5.0"
-    lodash.get "^4.4.2"
-    lodash.set "^4.3.2"
 
 "@terascope/utils@^0.11.0":
   version "0.11.0"
@@ -672,7 +649,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bluebird@^3.5.4:
+bluebird@^3.5.5:
   version "3.5.5"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.5.tgz#a8d0afd73251effbbd5fe384a77d73003c17a71f"
   integrity sha512-5am6HnnfN+urzt4yfg7IgTbotDjIT/u8AJpEt0sIU9FtXfVeezXAPKswrG+xKUCOYAINpSdgZVDU6QFh+cuH3w==
@@ -3930,12 +3907,12 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
 
-teraslice-test-harness@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.7.0.tgz#78716e18808659f1ab1ec834bb0afec9e3d10745"
-  integrity sha512-6yjXe7n/DJLgZHM1e/zEcKtDnPiYdaJWYiqgknUl6beyT5pYgLsLeWl+Or/2K0e709pL+pDi3FfHTkyVzYdiLg==
+teraslice-test-harness@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.8.1.tgz#47ebe6bb21142d83e99bcae1d4f34610a98ca04c"
+  integrity sha512-epGwA9E/KW7/y3Oth+Wx5nyKXhBb4oImJCRizj0v9BQvERHg1Z8zj/Q8YXBJdRHE1W3hIpERWItwSFt3wQvK6g==
   dependencies:
-    "@terascope/job-components" "^0.19.0"
+    "@terascope/job-components" "^0.20.1"
     "@terascope/teraslice-op-test-harness" "^1.6.0"
     lodash "^4.17.11"
 
