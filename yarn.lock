@@ -3907,12 +3907,12 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
 
-teraslice-test-harness@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.8.0.tgz#b6f2bd2b10ee825ea89e4d5bc00412dcb0d44cc9"
-  integrity sha512-cNTNyFLh0DdI11LJcjDtE4mI50wfSy8mgKIs+1TD20bCrsXM98uboD9Tap/skM/8quKlad6gkhTHRrR57jOpRA==
+teraslice-test-harness@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.8.1.tgz#47ebe6bb21142d83e99bcae1d4f34610a98ca04c"
+  integrity sha512-epGwA9E/KW7/y3Oth+Wx5nyKXhBb4oImJCRizj0v9BQvERHg1Z8zj/Q8YXBJdRHE1W3hIpERWItwSFt3wQvK6g==
   dependencies:
-    "@terascope/job-components" "^0.20.0"
+    "@terascope/job-components" "^0.20.1"
     "@terascope/teraslice-op-test-harness" "^1.6.0"
     lodash "^4.17.11"
 
