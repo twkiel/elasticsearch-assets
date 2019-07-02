@@ -12,12 +12,12 @@ class Schema extends ConvictSchema {
             },
             type: {
                 doc: 'type of the elasticsearch data string',
-                default: '',
-                format: 'required_String'
+                default: '_doc',
+                format: 'optional_String'
             },
             concurrency: {
-                doc: 'number of cuncurrent requests to elasticsearch',
-                default: 100
+                doc: 'number of cuncurrent requests to elasticsearch, defaults to 10',
+                default: 10
             },
             source_fields: {
                 doc: 'fields to retreive from elasticsearch, array of fields, defaults to all fields',
@@ -41,12 +41,12 @@ class Schema extends ConvictSchema {
                 default: 'default'
             },
             cache_size: {
-                doc: 'max number of items to store in the cache (not memory size), default to 1000000',
-                default: 1000000
+                doc: 'max number of items to store in the cache (not memory size), default to Infinity',
+                default: Infinity
             },
             max_age: {
-                doc: 'length of time before a record expires in milliseconds positive integer, default: 24 hours',
-                default: 24 * 3600 * 1000
+                doc: 'length of time before a record expires in milliseconds positive integer, defaults to 0 which means it stays indefinetly until purged',
+                default: 0
             }
         };
     }
