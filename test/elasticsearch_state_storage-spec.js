@@ -62,14 +62,12 @@ describe('elasticsearch state storage api', () => {
             {
                 _name: 'elasticsearch_state_storage:foo',
                 index: 'someIndex',
-                type: 'type',
-                id_field: idField
+                type: 'type'
             },
             {
                 _name: 'elasticsearch_state_storage:bar',
                 index: 'someIndex',
-                type: 'type',
-                id_field: idField
+                type: 'type'
             }
         ],
         operations: [
