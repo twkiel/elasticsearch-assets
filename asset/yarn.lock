@@ -46,6 +46,16 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
+"@terascope/teraslice-state-storage@^0.2.0":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.1.1.tgz#8a6bfa15b87007070aac2e7d1a528fe53fb11b5c"
+  integrity sha512-HH1NuotPACp60QiRoLG3jnPM9Oyb7rJCj5K80ePdL2IeiKXCSQZM7MSn4rhtizo+0C3XR2qIyfqYNqg7AANwfA==
+  dependencies:
+    "@terascope/elasticsearch-api" "^2.0.3"
+    "@terascope/job-components" "^0.20.2"
+    bluebird "^3.5.1"
+    lru-cache "^5.1.1"
+
 "@terascope/utils@^0.11.0":
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.11.1.tgz#229a432cf74947982cb80ea1200ef55a400a0bba"
@@ -70,7 +80,19 @@
     lodash.get "^4.4.2"
     lodash.set "^4.3.2"
 
-bluebird@^3.5.5:
+"@terascope/utils@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.12.0.tgz#5602bdc60aa26a0daf11068a0918c010fbe1b80b"
+  integrity sha512-tmSpoKYLhoGNNy697kvpYresMgi2Ds7m5PP+GhNIYohyCxw2NCT5MHoiX3ATszOoIASDgjqfMNZ1yx5Tiq0cYg==
+  dependencies:
+    debug "^4.1.1"
+    is-plain-object "^3.0.0"
+    kind-of "^6.0.2"
+    lodash.clonedeep "^4.5.0"
+    lodash.get "^4.4.2"
+    lodash.set "^4.3.2"
+
+bluebird@^3.5.1, bluebird@^3.5.5:
   version "3.5.5"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.5.tgz#a8d0afd73251effbbd5fe384a77d73003c17a71f"
   integrity sha512-5am6HnnfN+urzt4yfg7IgTbotDjIT/u8AJpEt0sIU9FtXfVeezXAPKswrG+xKUCOYAINpSdgZVDU6QFh+cuH3w==

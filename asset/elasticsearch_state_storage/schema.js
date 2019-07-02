@@ -27,16 +27,12 @@ class Schema extends ConvictSchema {
                 doc: 'how many docs to send in the elasticsearch mget request at a time, defaults to 2500',
                 default: 2500
             },
-            id_field: {
-                doc: 'specifies the metadata field to use as the key for caching and retrieving docs from elasticsearch, defaults to "_key"',
-                default: '_key'
-            },
             persist: {
                 doc: 'If set to true will save state in storage for mset, doest not apply to set, defaults to false',
                 default: false
             },
             persist_field: {
-                doc: ' If persist is true this option is the name of the key field that will be the key in the es bulk update, this may be the same as the id_field but not necessarily, defaults to value in id_field',
+                doc: ' If persist is true this option is the name of the metadata key field that will be used to make the id of the doc in the es bulk update, defaults to _id',
                 default: '',
                 format: 'optional_String'
             },
