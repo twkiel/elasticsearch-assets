@@ -8,13 +8,27 @@ function newProcessor(context, opConfig) {
         const offsets = {
             daily: 10,
             monthly: 7,
+            weekly: 4,
             yearly: 4
         };
 
         const end = offsets[opConfig.timeseries] || 10;
         let date;
+
         try {
             date = new Date(record[opConfig.date_field]).toISOString().slice(0, end);
+
+            // weekly doesn't have a simple offset, needs to be calculated
+            if (opConfig.timeseries === 'weekly') {
+                // weeks since start of the record year, round up to start on 1
+                let weeks = Math.ceil((new Date(record[opConfig.date_field]) - new Date(`${date}-01-01T00:00:00.000Z`))
+                   / (86400 * 1000 * 7));
+
+                // times exactly on jan 1 and 0 seconds/ milliseconds would still be 0
+                if (weeks === 0) weeks = 1;
+
+                date = `${date}.${weeks.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`;
+            }
         } catch (err) {
             throw new Error(`opConfig date field: ${opConfig.date_field} either does not exists or is not a valid date on the records processed`);
         }
@@ -166,13 +180,13 @@ function schema() {
             format: 'optional_String'
         },
         timeseries: {
-            doc: 'Set to either daily, monthly or yearly if you want the index to be based off it, must be '
+            doc: 'Set to either daily, weekly, monthly or yearly if you want the index to be based off it, must be '
             + 'used in tandem with index_prefix and date_field',
             default: '',
             format(value) {
                 // This will generate logstash style timeseries names
-                if (value && (!_.includes(['daily', 'monthly', 'yearly'], value))) {
-                    throw new Error("timeseries must be one of 'daily', 'monthly', 'yearly'");
+                if (value && (!_.includes(['daily', 'weekly', 'monthly', 'yearly'], value))) {
+                    throw new Error("timeseries must be one of 'daily', 'weekly', 'monthly', 'yearly'");
                 }
             }
         },

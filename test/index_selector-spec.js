@@ -43,6 +43,44 @@ describe('elasticsearch index selector', () => {
         }).not.toThrowError();
     });
 
+    it('should correctly create weekly index name', async () => {
+        const opConfig = {
+            _op: 'elasticsearch_index_selector',
+            index: '-',
+            index_prefix: 'weekly-test',
+            type: 'events',
+            timeseries: 'weekly',
+            date_field: 'date'
+        };
+
+        // 2019 started on a tuesday, for 2019 week is measured as start tuesday to end of monday
+        // first three docs are in the same week
+        // 4th and 5th are just outside of the week window of the 1st 3 docs
+        const data = [
+            { _id: '1', date: '2019-07-02T00:00:00.001Z' },
+            { _id: '2', date: '2019-07-08T23:59:59.999Z' },
+            { _id: '3', date: '2019-07-05T23:14:01.032Z' },
+            { _id: '4', date: '2019-07-09T00:00:00.001Z' },
+            { _id: '5', date: '2019-07-01T23:59:59.999Z' },
+            { _id: '6', date: '2019-01-01T00:00:00.001Z' },
+            { _id: '7', date: '2019-12-31T23:59:59.999Z' },
+            { _id: '8', date: '2020-01-01T00:00:00.001Z' },
+            { _id: '9', date: '2018-01-01T00:00:00.000Z' }
+        ];
+
+        const results = await opTest.processData(opConfig, data);
+
+        expect(results[0].index._index).toBe('weekly-test-2019.27');
+        expect(results[2].index._index).toBe('weekly-test-2019.27');
+        expect(results[4].index._index).toBe('weekly-test-2019.27');
+        expect(results[6].index._index).toBe('weekly-test-2019.28');
+        expect(results[8].index._index).toBe('weekly-test-2019.26');
+        expect(results[10].index._index).toBe('weekly-test-2019.01');
+        expect(results[12].index._index).toBe('weekly-test-2019.53');
+        expect(results[14].index._index).toBe('weekly-test-2020.01');
+        expect(results[16].index._index).toBe('weekly-test-2018.01');
+    });
+
     it('new processor will throw properly', () => {
         const job1 = {
             operations: [
