@@ -43,6 +43,42 @@ describe('elasticsearch index selector', () => {
         }).not.toThrowError();
     });
 
+    it('new processor will throw error on a bad date field in timeseries', async () => {
+        const op1 = {
+            _op: 'elasticsearch_index_selector',
+            index: '-',
+            index_prefix: 'weekly-test',
+            type: 'events',
+            timeseries: 'weekly',
+            date_field: 'name'
+        };
+
+        const data = [
+            { _id: '1', date: '2019-07-02T00:00:00.001Z', name: 'bob' },
+        ];
+
+        try {
+            await opTest.processData(op1, data);
+        } catch (err) {
+            expect(err.message).toBe('opConfig date field: name either does not exists or is not a valid date on the records processed');
+        }
+
+        const op2 = {
+            _op: 'elasticsearch_index_selector',
+            index: '-',
+            index_prefix: 'weekly-test',
+            type: 'events',
+            timeseries: 'monthly',
+            date_field: 'name'
+        };
+
+        try {
+            await opTest.processData(op2, data);
+        } catch (err) {
+            expect(err.message).toEqual('opConfig date field: name either does not exists or is not a valid date on the records processed');
+        }
+    });
+
     it('should correctly create weekly index name', async () => {
         const opConfig = {
             _op: 'elasticsearch_index_selector',
