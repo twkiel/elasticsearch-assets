@@ -4,35 +4,41 @@ const _ = require('lodash');
 const { DataEntity } = require('@terascope/job-components');
 
 function newProcessor(context, opConfig) {
-    function formattedDate(record) {
-        const offsets = {
-            daily: 10,
-            monthly: 7,
-            weekly: 4,
-            yearly: 4
-        };
+    function _getWeeklyIndex(date) {
+        const year = date.slice(0, 4);
+        let week = Math.ceil((Date.parse(date) - Date.parse(`${year}`)) / 604800000);
 
-        const end = offsets[opConfig.timeseries] || 10;
+        // if date is on first of year with 0 seconds and millis will still get 0 week
+        if (week === 0) week = 1;
+
+        if (week < 10) week = `0${week}`;
+
+        return `${year}.${week}`;
+    }
+
+    function formattedDate(record) {
+        // date check
         let date;
 
         try {
-            date = new Date(record[opConfig.date_field]).toISOString().slice(0, end);
-
-            // weekly doesn't have a simple offset, needs to be calculated
-            if (opConfig.timeseries === 'weekly') {
-                // weeks since start of the record year, round up to start on 1
-                let weeks = Math.ceil((new Date(record[opConfig.date_field]) - new Date(`${date}-01-01T00:00:00.000Z`))
-                   / (86400 * 1000 * 7));
-
-                // times exactly on jan 1 and 0 seconds/ milliseconds would still be 0
-                if (weeks === 0) weeks = 1;
-
-                date = `${date}.${weeks.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`;
-            }
+            date = new Date(record[opConfig.date_field]).toISOString();
         } catch (err) {
             throw new Error(`opConfig date field: ${opConfig.date_field} either does not exists or is not a valid date on the records processed`);
         }
 
+        if (opConfig.timeseries === 'weekly') {
+            return _getWeeklyIndex(date);
+        }
+
+        const offsets = {
+            daily: 10,
+            monthly: 7,
+            yearly: 4
+        };
+
+        const end = offsets[opConfig.timeseries] || 10;
+
+        date = date.slice(0, end);
         return date.replace(/-/gi, '.');
     }
 
