@@ -5,15 +5,8 @@ const { DataEntity } = require('@terascope/job-components');
 
 function newProcessor(context, opConfig) {
     function _getWeeklyIndex(date) {
-        const year = date.slice(0, 4);
-        let week = Math.ceil((Date.parse(date) - Date.parse(`${year}`)) / 604800000);
-
-        // if date is on first of year with 0 seconds and millis will still get 0 week
-        if (week === 0) week = 1;
-
-        if (week < 10) week = `0${week}`;
-
-        return `${year}.${week}`;
+        // weeks since Jan 1, 1970
+        return Math.floor(Date.parse(date) / 604800000);
     }
 
     function formattedDate(record) {
