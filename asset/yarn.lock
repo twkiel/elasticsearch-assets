@@ -15,11 +15,11 @@
     defer-to-connect "^1.0.1"
 
 "@terascope/elasticsearch-api@^2.0.3":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.0.5.tgz#281667d613e8bf36444aa84cab1f86a84c075a46"
-  integrity sha512-7J4vn4e66/suJuQXsWEFjhCGpSddxRr/Idi+tzibGDt7RgBveKZaXSRrbeSTnCUBqMxC83l0Zbet4/1kKnVi+Q==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.0.tgz#e89135b514a78576849846690a4d584f0a848a5d"
+  integrity sha512-rxfu06yv1mx7qFrznRchjhIBeIvdq64dEDr5tJT+I/rrTcm5FvoT05fyxBQuW9OMX1CIs8IZpX1Osl8E/YO5yA==
   dependencies:
-    "@terascope/utils" "^0.12.3"
+    "@terascope/utils" "^0.12.4"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
@@ -56,7 +56,7 @@
     bluebird "^3.5.5"
     lru-cache "^5.1.1"
 
-"@terascope/utils@^0.12.3", "@terascope/utils@^0.12.4":
+"@terascope/utils@^0.12.4":
   version "0.12.4"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.12.4.tgz#bc849b574c0f7cf9a4163db241dc8b2db92546ac"
   integrity sha512-iA2/7cGTqkiOP/wyS46iFjTYVbIHpNmJ2hlAfTbUxPQvnU6rP1H2zi5ZK1NRfKBrrp0JvcqxgBQVWReIbt27QA==
