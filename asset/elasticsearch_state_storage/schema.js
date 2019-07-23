@@ -41,13 +41,9 @@ class Schema extends ConvictSchema {
                 default: 'default'
             },
             cache_size: {
-                doc: 'max number of items to store in the cache (not memory size), default to Infinity',
-                default: Infinity
+                doc: 'max number of items to store in the cache (not memory size), defaults to 2147483647',
+                default: (2 ** 31) - 1,
             },
-            max_age: {
-                doc: 'length of time before a record expires in milliseconds positive integer, defaults to 0 which means it stays indefinetly until purged',
-                default: 0
-            }
         };
     }
 }

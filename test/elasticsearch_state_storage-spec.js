@@ -62,11 +62,13 @@ describe('elasticsearch state storage api', () => {
             {
                 _name: 'elasticsearch_state_storage:foo',
                 index: 'someIndex',
+                cache_size: (2 ** 16) - 1,
                 type: 'type'
             },
             {
                 _name: 'elasticsearch_state_storage:bar',
                 index: 'someIndex',
+                cache_size: (2 ** 16) - 1,
                 type: 'type'
             }
         ],
