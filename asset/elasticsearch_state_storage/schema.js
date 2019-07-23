@@ -1,6 +1,6 @@
 'use strict';
 
-const { ConvictSchema, TSError } = require('@terascope/job-components');
+const { ConvictSchema } = require('@terascope/job-components');
 
 class Schema extends ConvictSchema {
     build() {
@@ -42,12 +42,7 @@ class Schema extends ConvictSchema {
             },
             cache_size: {
                 doc: 'max number of items to store in the cache (not memory size), defaults to 2147483647',
-                default: 2147483647,
-                format: (value) => {
-                    if (value > 2147483647) {
-                        throw new TSError('cache_size cannot be set to greater than 2147483647');
-                    }
-                }
+                default: (2 ** 31) - 1,
             },
         };
     }
