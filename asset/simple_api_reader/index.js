@@ -18,9 +18,10 @@ function createClient(context, opConfig) {
     // NOTE: currently we do no have access to _type or _id of each doc
     const { logger } = context;
 
-    async function makeRequest(uri) {
+    async function makeRequest(uri, query) {
         try {
             const { body } = await got(uri, {
+                query,
                 json: true,
                 timeout: opConfig.timeout,
                 retry: 0
@@ -29,15 +30,18 @@ function createClient(context, opConfig) {
         } catch (err) {
             if (err instanceof got.TimeoutError) {
                 throw new TSError('HTTP request timed out connecting to API endpoint.', {
+                    statusCode: 408,
                     context: {
-                        endpoint: uri
+                        endpoint: uri,
+                        query,
                     }
                 });
             }
             throw new TSError(err, {
                 reason: 'Failure making search request',
                 context: {
-                    endpoint: uri
+                    endpoint: uri,
+                    query,
                 }
             });
         }
@@ -48,18 +52,17 @@ function createClient(context, opConfig) {
         const dateFieldName = opConfig.date_field_name;
         // put in the dateFieldName into fields so date reader can work
         if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
-        const fieldsQuery = fields ? `&fields=${fields.join(',')}` : '';
+        const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
-        const searchQuery = parseQueryConfig(mustQuery);
 
         function parseQueryConfig(mustArray) {
             const queryOptions = {
                 query_string: _parseEsQ,
                 range: _parseDate,
             };
-            let geoQuery = _parseGeoQuery();
-            if (geoQuery.length > 0) geoQuery = `&${geoQuery}`;
-            let query = '';
+            const sortQuery = {};
+            const geoQuery = _parseGeoQuery();
+            let luceneQuery = '';
 
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
@@ -69,34 +72,38 @@ function createClient(context, opConfig) {
                             let queryStr = queryFn(config);
                             if (key !== 'range') queryStr = `(${queryStr})`;
 
-                            if (query.length) {
-                                query = `${query} AND ${queryStr}`;
+                            if (luceneQuery.length) {
+                                luceneQuery = `${luceneQuery} AND ${queryStr}`;
                             } else {
-                                query = queryStr;
+                                luceneQuery = queryStr;
                             }
                         }
                     });
                 });
             } else {
-                query = _parseEsQ();
+                luceneQuery = _parseEsQ();
             }
             // geo sort will be taken care of in the teraserver search api
-            let sort = '';
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
                 queryConfig.body.sort.forEach((sortType) => {
                     // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
                     if (sortType[dateFieldName]) {
                         // {"date":{"order":"asc"}}
-                        sort = `&sort=${dateFieldName}:${queryConfig.body.sort[0][dateFieldName].order}`;
+                        sortQuery.sort = `${dateFieldName}:${queryConfig.body.sort[0][dateFieldName].order}`;
                     }
                 });
             }
+
             let { size } = queryConfig;
             if (size == null) {
                 ({ size } = opConfig);
             }
-            const initialQuery = `${opConfig.endpoint}/${opConfig.index}?token=${opConfig.token}&`;
-            return `${initialQuery}q=${query}&size=${size}${sort}${geoQuery}${fieldsQuery}`;
+
+            return Object.assign({}, geoQuery, sortQuery, fieldsQuery, {
+                token: opConfig.token,
+                q: luceneQuery,
+                size,
+            });
         }
 
         function _parseGeoQuery() {
@@ -109,16 +116,15 @@ function createClient(context, opConfig) {
                 geo_sort_order: geoSortOrder,
                 geo_sort_unit: geoSortUnit
             } = opConfig;
-            const geoQuery = [];
-
-            if (geoBoxTopLeft) geoQuery.push(`geo_box_top_left=${geoBoxTopLeft}`);
-            if (geoBoxBottomRight) geoQuery.push(`geo_box_bottom_right=${geoBoxBottomRight}`);
-            if (geoPoint) geoQuery.push(`geo_point=${geoPoint}`);
-            if (geoDistance) geoQuery.push(`geo_distance=${geoDistance}`);
-            if (geoSortPoint) geoQuery.push(`geo_sort_point=${geoSortPoint}`);
-            if (geoSortOrder) geoQuery.push(`geo_sort_order=${geoSortOrder}`);
-            if (geoSortUnit) geoQuery.push(`geo_sort_unit=${geoSortUnit}`);
-            return geoQuery.join('&');
+            const geoQuery = {};
+            if (geoBoxTopLeft) geoQuery.geo_box_top_left = geoBoxTopLeft;
+            if (geoBoxBottomRight) geoQuery.geo_box_bottom_right = geoBoxBottomRight;
+            if (geoPoint) geoQuery.geo_point = geoPoint;
+            if (geoDistance) geoQuery.geo_distance = geoDistance;
+            if (geoSortPoint) geoQuery.geo_sort_point = geoSortPoint;
+            if (geoSortOrder) geoQuery.geo_sort_order = geoSortOrder;
+            if (geoSortUnit) geoQuery.geo_sort_unit = geoSortUnit;
+            return geoQuery;
         }
 
         function _parseEsQ(op) {
@@ -142,9 +148,12 @@ function createClient(context, opConfig) {
             return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
-        function callTeraserver(uri) {
+        function callTeraserver() {
+            const uri = `${opConfig.endpoint}/${opConfig.index}`;
+            const query = parseQueryConfig(mustQuery);
+
             return Promise.resolve()
-                .then(() => makeRequest(uri))
+                .then(() => makeRequest(uri, query))
                 .then((response) => {
                     let esResults = [];
                     if (response.results) {
@@ -170,7 +179,7 @@ function createClient(context, opConfig) {
                 });
         }
 
-        return callTeraserver(searchQuery);
+        return callTeraserver();
     }
 
     return {

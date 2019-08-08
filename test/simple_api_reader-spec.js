@@ -76,6 +76,22 @@ describe('simple_api_reader', () => {
                     count: 5000,
                 }
             }],
+            ['lucene query with url characters', {
+                query: {
+                    token: 'test-token',
+                    q: '(foo:"bar+baz")',
+                    size: 5000,
+                },
+                opConfig: {
+                    query: 'foo:"bar+baz"',
+                    token: 'test-token',
+                    size: 100000,
+                    date_field_name: 'date',
+                },
+                msg: {
+                    count: 5000,
+                }
+            }],
             ['lucene query with fields', {
                 query: {
                     token: 'test-token',
