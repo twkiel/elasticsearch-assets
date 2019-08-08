@@ -88,6 +88,7 @@ function createClient(context, opConfig) {
                 queryConfig.body.sort.forEach((sortType) => {
                     // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
                     if (sortType[dateFieldName]) {
+                        // there is only one sort allowed
                         // {"date":{"order":"asc"}}
                         sortQuery.sort = `${dateFieldName}:${queryConfig.body.sort[0][dateFieldName].order}`;
                     }
