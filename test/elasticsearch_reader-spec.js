@@ -227,7 +227,7 @@ describe('elasticsearch_reader', () => {
         opTest.events.on('slicer:execution:update', checkUpdate);
 
         async function waitForUpdate(config, endDate) {
-            const waitFor = () => new Promise(r => setTimeout(() => r(updatedConfig), 30));
+            const waitFor = () => new Promise((r) => setTimeout(() => r(updatedConfig), 30));
             client.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }]);
             const executionConfig = { lifecycle: 'once', slicers: 1, operations: [config] };
             await opTest.init({ executionConfig, client });
@@ -685,7 +685,7 @@ describe('elasticsearch_reader', () => {
         const results = await test.run();
 
         hexadecimal.forEach((char) => {
-            const subslice = results.find(s => s.key === `test#${char}*`);
+            const subslice = results.find((s) => s.key === `test#${char}*`);
             expect(subslice).not.toBeUndefined();
             expect(subslice.start.format() === firstDate.format()).toEqual(true);
             expect(subslice.end.format() === closingDate.format()).toEqual(true);

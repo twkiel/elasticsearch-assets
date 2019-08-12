@@ -273,8 +273,8 @@ function selfValidation(op) {
 }
 
 function crossValidation(job) {
-    const opConfig = job.operations.find(op => op._op === 'elasticsearch_index_selector');
-    const preserveId = job.operations.find(op => op.preserve_id === true);
+    const opConfig = job.operations.find((op) => op._op === 'elasticsearch_index_selector');
+    const preserveId = job.operations.find((op) => op.preserve_id === true);
 
     if (!opConfig.type && !preserveId) {
         throw new Error('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');

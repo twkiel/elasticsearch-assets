@@ -91,7 +91,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
                     // if count is zero then close path to prevent further iteration
                     return determineKeySlice(generator, true, rangeObj);
                 })
-                .catch(err => retryError(key, err, getKeySlice, query));
+                .catch((err) => retryError(key, err, getKeySlice, query));
         }
 
         return getKeySlice(esQuery);
@@ -228,7 +228,7 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         // configs and division of key array
         if (range) {
             return Promise.resolve(
-                retryData.map(data => keyGenerator(baseKeyArray, baseKeyArray, data.key, range))
+                retryData.map((data) => keyGenerator(baseKeyArray, baseKeyArray, data.key, range))
             );
         }
 
@@ -247,5 +247,5 @@ module.exports = (context, client, executionContext, opConfig, logger, retryData
         );
     }
 
-    return Promise.resolve(slicerKeySet.map(keySet => keyGenerator(baseKeyArray, keySet)));
+    return Promise.resolve(slicerKeySet.map((keySet) => keyGenerator(baseKeyArray, keySet)));
 };

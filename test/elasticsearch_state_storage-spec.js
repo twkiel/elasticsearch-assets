@@ -105,7 +105,7 @@ describe('elasticsearch state storage api', () => {
         const reader = harness.getOperation('test-reader');
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        reader.fetch = async incDocs => fn(incDocs.map(addTestMeta));
+        reader.fetch = async (incDocs) => fn(incDocs.map(addTestMeta));
 
         noopFoo.onBatch = async (docs) => {
             const results = [];

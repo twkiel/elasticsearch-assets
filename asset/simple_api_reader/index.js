@@ -158,7 +158,7 @@ function createClient(context, opConfig) {
                 .then((response) => {
                     let esResults = [];
                     if (response.results) {
-                        esResults = _.map(response.results, result => ({ _source: result }));
+                        esResults = _.map(response.results, (result) => ({ _source: result }));
                     }
 
                     return ({

@@ -81,7 +81,7 @@ function newProcessor(context, opConfig) {
     function recursiveSend(_client, dataArray) {
         const slicedData = splitArray(dataArray, limit);
 
-        return Promise.map(slicedData, data => send(_client, data));
+        return Promise.map(slicedData, (data) => send(_client, data));
     }
 
     // This normalizes the top element of the record so data fields can be accessed without
@@ -148,7 +148,7 @@ function newProcessor(context, opConfig) {
             }
         });
 
-        return Promise.all(senders).then(results => _.flatten(results));
+        return Promise.all(senders).then((results) => _.flatten(results));
     }
 
 
