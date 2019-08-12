@@ -11,7 +11,7 @@ function newReader(opConfig, client) {
         const query = elasticsearch.buildQuery(queryConfig, msg);
 
         return elasticsearch.search(query)
-            .then(fullResponseObj => fullResponseObj.hits.hits.map((doc) => {
+            .then((fullResponseObj) => fullResponseObj.hits.hits.map((doc) => {
                 const now = Date.now();
                 const metadata = {
                     _key: doc._id,

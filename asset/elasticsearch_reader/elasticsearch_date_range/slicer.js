@@ -136,7 +136,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
         // track of them for recoveries
         if (!opConfig.start || !opConfig.end) {
             const { operations } = executionConfig;
-            const opIndex = operations.findIndex(config => config._op === opName);
+            const opIndex = operations.findIndex((config) => config._op === opName);
             const update = {
                 start: dates.start.format(dateFormat),
                 end: dates.limit.format(dateFormat)
@@ -150,7 +150,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
 
     function getDates() {
         return Promise.resolve(getIndexDate(opConfig.start, 'start'))
-            .then(startDate => Promise.resolve(getIndexDate(opConfig.end, 'end'))
+            .then((startDate) => Promise.resolve(getIndexDate(opConfig.end, 'end'))
                 .then((endDate) => {
                     const finalDates = { start: startDate, limit: endDate };
                     if (startDate && endDate) {
@@ -197,7 +197,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                         // return the zero range start with the correct end
 
                         return Promise.resolve(determineSlice(cloneDates, slicerId, false))
-                            .then(recursedData => ({
+                            .then((recursedData) => ({
                                 start: dateParams.start,
                                 end: recursedData.end,
                                 count: recursedData.count
@@ -323,7 +323,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                     if (shouldDivideByID && data.count >= threshold) {
                         logger.debug('date slicer is recursing by keylist');
                         return Promise.resolve(makeKeyList(data))
-                            .then(results => results)
+                            .then((results) => results)
                             .catch((err) => {
                                 const errMsg = parseError(err);
                                 logger.error('error while subslicing by key', errMsg);
@@ -337,7 +337,10 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                         count: data.count
                     };
                 })
-                .catch(err => retryError(dateParams.start.format(dateFormat), err, sliceDate, msg));
+                .catch((err) => {
+                    const retryInput = dateParams.start.format(dateFormat);
+                    return retryError(retryInput, err, sliceDate, msg);
+                });
         };
     }
 
@@ -442,7 +445,7 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                     if (shouldDivideByID && data.count >= threshold) {
                         logger.debug('date slicer is recursing by keylist');
                         return Promise.resolve(makeKeyList(data))
-                            .then(results => results)
+                            .then((results) => results)
                             .catch((err) => {
                                 const errMsg = parseError(err);
                                 logger.error('error while subslicing by key', errMsg);
@@ -456,7 +459,10 @@ function newSlicer(context, opConfig, executionContext, retryData, logger, clien
                         count: data.count
                     };
                 })
-                .catch(err => retryError(dateParams.start.format(dateFormat), err, sliceDate, msg));
+                .catch((err) => {
+                    const retryInput = dateParams.start.format(dateFormat);
+                    return retryError(retryInput, err, sliceDate, msg);
+                });
         };
     }
 

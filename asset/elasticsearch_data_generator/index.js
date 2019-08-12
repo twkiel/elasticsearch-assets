@@ -45,14 +45,14 @@ function newReader(context, opConfig) {
                     }
                     return results;
                 })
-                .catch(err => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
+                .catch((err) => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
         }
 
         return mocker()
             .schema('schema', dataSchema, msg)
             .build()
-            .then(dataObj => dataObj.schema)
-            .catch(err => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
+            .then((dataObj) => dataObj.schema)
+            .catch((err) => Promise.reject(new Error(`could not generate data error: ${_.toString(err)}`)));
     };
 }
 

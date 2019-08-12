@@ -48,7 +48,7 @@ class MockClient {
 
     setSequenceData(data) {
         this.sequence = data.map(
-            obj => ({
+            (obj) => ({
                 _shards: { failed: 0 },
                 hits: {
                     total: obj.count != null ? obj.count : 100,
