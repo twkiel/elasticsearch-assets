@@ -14,12 +14,21 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.3":
+"@terascope/elasticsearch-api@^2.1.0":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.3.tgz#a41b928771e8336d99263f0a85dddb87378a99aa"
   integrity sha512-b0NUQL6QBXNz+dEq2sNf7wv87MeggEjQcIMLRX3680UIsGjk8qMn0Bb/62DZEb8B6dgqgSRTzoyN3uXZrly2EQ==
   dependencies:
     "@terascope/utils" "^0.14.1"
+    bluebird "^3.5.5"
+    lodash "^4.17.11"
+
+"@terascope/elasticsearch-api@^2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.4.tgz#7d6c1ee492025a749a41bb88b608581bd11520b6"
+  integrity sha512-Eg/Vz3bT7paA0qV+8APrTxOWvFw62RBMtPUT4CDQ7J16e0pxBkMfoAlzKuIbohJdHELgl+qxNLNrhnhgYEPddg==
+  dependencies:
+    "@terascope/utils" "^0.15.0"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
@@ -46,12 +55,12 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
-"@terascope/teraslice-state-storage@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.6.0.tgz#a7b84cbcf65d972a5f377acdfb8c0b56d4631a88"
-  integrity sha512-telJqYYj13FoMl4wwLrdmcISdfG/IGwyEgHg0nBpOqYC0Qz0kvEsZsygOPdMipIO4R/bWZF/9bc0QWQn7r5G4Q==
+"@terascope/teraslice-state-storage@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.7.0.tgz#5f198cb4ae649a0eb358a901e5eae9cb6aa166aa"
+  integrity sha512-YI4Qek93VCVeeTev3QVuPlLgZ1yv6nbwMOP5OIcH4gbZjiy3AdeT1kupr8oeaG4m4T9K5c3hjRhOUkFSMtmGQg==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.1.3"
+    "@terascope/elasticsearch-api" "^2.1.4"
     "@terascope/utils" "^0.15.0"
     bluebird "^3.5.5"
     mnemonist "^0.30.0"
