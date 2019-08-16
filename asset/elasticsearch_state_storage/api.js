@@ -12,7 +12,7 @@ class ElasticsearchStateStorage extends OperationAPI {
             cached: true
         });
 
-        this.stateStorage = new ESCachedStateStorage(client, this.context.logger, this.apiConfig);
+        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig);
     }
 
     async initialize() {
