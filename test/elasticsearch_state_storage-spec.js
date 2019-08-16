@@ -1,6 +1,5 @@
 'use strict';
 
-require('jest-extended');
 const path = require('path');
 const { WorkerTestHarness, newTestJobConfig } = require('teraslice-test-harness');
 const { DataEntity } = require('@terascope/job-components');
