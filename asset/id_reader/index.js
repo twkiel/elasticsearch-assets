@@ -50,7 +50,7 @@ function schema() {
         key_type: {
             doc: 'The type of id used in index',
             default: 'base64url',
-            format: ['base64url', 'hexadecimal', 'HEXADECIMAL']
+            format: ['base64url', 'base64', 'hexadecimal', 'HEXADECIMAL']
         },
         key_range: {
             doc: 'if provided, slicer will only recurse on these given keys',
