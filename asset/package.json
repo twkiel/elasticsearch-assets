@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "main": "utils.js",
     "devDependencies": {},
     "scripts": {
@@ -12,7 +12,7 @@
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.1.0",
         "@terascope/error-parser": "^1.0.1",
-        "@terascope/job-components": "^0.22.1",
+        "@terascope/job-components": "^0.23.0",
         "@terascope/teraslice-state-storage": "^0.7.1",
         "bluebird": "^3.5.5",
         "datemath-parser": "^1.0.6",
