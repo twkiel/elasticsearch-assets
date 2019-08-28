@@ -66,7 +66,9 @@ function retryModule(logger, numOfRetries) {
 
         retry[key] += 1;
         if (retry[key] > numOfRetries) {
-            return Promise.reject(`max_retries met for slice, key: ${key}`, errMessage);
+            return Promise.reject(
+                new Error(`max_retries met for slice, key: ${key}`)
+            );
         }
 
         return fn(msg);
