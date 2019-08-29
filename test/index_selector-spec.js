@@ -192,13 +192,21 @@ describe('elasticsearch index selector', () => {
             type: 'events',
             id_field: 'name',
             update_fields: ['name'],
+            update_retry_on_conflict: 11,
             delete: false,
             update: true
         };
         const data = [{ some: 'data', name: 'someName' }];
         const results = await opTest.processData(opConfig, data);
 
-        expect(results[0]).toEqual({ update: { _index: 'some_index', _type: 'events', _id: 'someName' } });
+        expect(results[0]).toEqual({
+            update: {
+                _index: 'some_index',
+                _type: 'events',
+                _id: 'someName',
+                retry_on_conflict: 11
+            }
+        });
         expect(results[1]).toEqual({ doc: { name: 'someName' } });
     });
 
