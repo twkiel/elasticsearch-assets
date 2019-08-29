@@ -76,7 +76,7 @@ function newProcessor(context, opConfig) {
                 indexSpec.update = meta;
 
                 if (opConfig.update_retry_on_conflict > 0) {
-                    meta._retry_on_conflict = opConfig.update_retry_on_conflict;
+                    meta.retry_on_conflict = opConfig.update_retry_on_conflict;
                 }
             } else if (opConfig.delete) {
                 indexSpec.delete = meta;
@@ -111,7 +111,7 @@ function newProcessor(context, opConfig) {
 
                     if (opConfig.script) {
                         update.script = {
-                            inline: opConfig.script
+                            source: opConfig.script
                         };
                     }
 
