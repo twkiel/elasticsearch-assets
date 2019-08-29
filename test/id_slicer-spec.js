@@ -39,7 +39,6 @@ describe('id_reader', () => {
         const job4 = { slicers: 20, operations: [{ _op: 'id_reader', key_type: 'hexadecimal' }] };
         const job5 = { slicers: 20, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
         const job6 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
-        const job7 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64' }] };
 
         function testValidation(job) {
             idReader.crossValidation(job);
