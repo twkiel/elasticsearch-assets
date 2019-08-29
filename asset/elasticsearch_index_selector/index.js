@@ -111,7 +111,7 @@ function newProcessor(context, opConfig) {
 
                     if (opConfig.script) {
                         update.script = {
-                            inline: opConfig.script
+                            source: opConfig.script
                         };
                     }
 

@@ -254,6 +254,33 @@ describe('elasticsearch index selector', () => {
         });
     });
 
+    it('script to run as part of an update request', async () => {
+        const opConfig = {
+            _op: 'elasticsearch_index_selector',
+            index: 'hello',
+            type: 'events',
+            upsert: true,
+            update_fields: [],
+            script: 'ctx._source.count += add',
+            script_params: { add: 'add' }
+        };
+        const data = [
+            { count: 1, add: 2 }
+        ];
+        const results = await opTest.processData(opConfig, data);
+
+        expect(results[0]).toEqual({ update: { _index: 'hello', _type: 'events' } });
+        expect(results[1]).toEqual({
+            upsert: { count: 1, add: 2 },
+            script: {
+                source: 'ctx._source.count += add',
+                params: {
+                    add: 2
+                }
+            }
+        });
+    });
+
     it('selfValidation makes sure that the opConfig is configured correctly', () => {
         const errorString = 'elasticsearch_index_selector is mis-configured, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters';
         const baseOP = {
