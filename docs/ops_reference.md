@@ -224,7 +224,7 @@ Example configuration
 {
     "_op": "elasticsearch_index_selector",
     "type": "events",
-    "indexPrefix": "events",
+    "index_prefix": "events",
     "timeseries": "daily",
     "date_field": "created"
 }
