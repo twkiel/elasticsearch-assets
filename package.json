@@ -31,6 +31,6 @@
         "jest-extended": "^0.11.2",
         "nock": "^11.3.3",
         "teraslice-test-harness": "^0.8.6",
-        "typescript": "^3.5.3"
+        "typescript": "^3.6.3"
     }
 }
